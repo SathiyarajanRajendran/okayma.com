@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" role="img" aria-labelledby="title desc">
+  <title id="title">Okayma.com logo</title>
+  <desc id="desc">An O-shaped mark with a confident check path, representing acceptance and practical solutions.</desc>
+  <circle cx="90" cy="90" r="64" fill="#fff8eb"/>
+  <circle cx="90" cy="90" r="54" fill="none" stroke="#10202b" stroke-width="13"/>
+  <path d="M60 93l23 23 47-55" fill="none" stroke="#14777a" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M131 58l16 2-4 15" fill="none" stroke="#c49a45" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="145" cy="61" r="4.8" fill="#d35f4d"/>
+</svg>
