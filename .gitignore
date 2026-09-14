@@ -2,3 +2,6 @@
 Thumbs.db
 desktop.ini
 .DS_Store
+
+# Local launch runbook (contains personal email; repo is public)
+DEPLOYMENT.md
