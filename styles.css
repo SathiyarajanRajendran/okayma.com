@@ -121,6 +121,7 @@ nav a:hover {
   position: relative;
   z-index: 1;
   align-self: end;
+  min-width: 0;
   max-width: 760px;
 }
 
@@ -370,6 +371,10 @@ footer a {
     padding-top: 112px;
   }
 
+  h1 {
+    font-size: clamp(2.4rem, 13.5vw, 4rem);
+  }
+
   .hero-actions {
     align-items: stretch;
     flex-direction: column;
@@ -393,5 +398,50 @@ footer a {
 
   footer {
     flex-direction: column;
+  }
+}
+
+/* Error page --------------------------------------------------------------- */
+
+.error-page {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  color: var(--white);
+  background: var(--ink);
+}
+
+.error-page .intro {
+  display: block;
+  max-width: 720px;
+}
+
+.error-page h2 {
+  margin-top: 8px;
+  color: var(--white);
+  font-size: clamp(2rem, 4vw, 3.2rem);
+}
+
+.error-page .intro-copy p {
+  color: rgba(255, 253, 248, 0.76);
+}
+
+.error-page .section-label {
+  color: var(--gold);
+}
+
+/* Motion preferences ------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
   }
 }
