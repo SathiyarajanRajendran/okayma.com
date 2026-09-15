@@ -4,12 +4,24 @@ import { createSession } from "../../../lib/auth.js";
 import { normaliseEmail } from "../../../lib/validate.js";
 import { rateLimit } from "../../../lib/ratelimit.js";
 
+// salt(16 bytes hex) + "$" + derived key(32 bytes hex), as hashPassword emits.
+const HASH_FORMAT = /^[0-9a-f]{32}\$[0-9a-f]{64}$/;
+
 export async function onRequestPost({ request, env }) {
   if (!sameOrigin(request)) return fail(403, "Request blocked.");
 
   const db = env.DB;
-  if (!env.ADMIN_PASSWORD_HASH) {
-    return fail(503, "Admin access is not configured yet. Set the ADMIN_PASSWORD_HASH secret.");
+
+  // Check the SHAPE, not just presence. A truncated or half-pasted secret is
+  // otherwise indistinguishable from a wrong password: every sign-in returns
+  // 401 and looks like operator error rather than broken configuration.
+  if (!HASH_FORMAT.test(env.ADMIN_PASSWORD_HASH || "")) {
+    return fail(
+      503,
+      "ADMIN_PASSWORD_HASH is missing or malformed. It must be the full " +
+        "salt$hash value printed by `npm run admin-password` — 32 hex " +
+        "characters, a dollar sign, then 64 hex characters."
+    );
   }
 
   // Throttle this endpoint: it is the one worth guessing at. Ten tries per

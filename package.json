@@ -2,13 +2,14 @@
   "name": "okayma-com",
   "private": true,
   "type": "module",
-  "description": "Okayma.com — static site plus the Cloudflare Pages Functions behind the ideas board.",
+  "description": "Okayma.com \u2014 static site plus the Cloudflare Pages Functions behind the ideas board.",
   "scripts": {
     "dev": "npx wrangler@3 pages dev --local --port 8788",
     "build": "npx wrangler@3 pages functions build --outfile .wrangler/functions-bundle.js",
     "deploy": "npx wrangler@3 pages deploy --project-name=okayma --branch=main --commit-dirty=true",
     "migrate:local": "npx wrangler@3 d1 migrations apply okayma-db --local",
     "migrate:remote": "npx wrangler@3 d1 migrations apply okayma-db --remote",
-    "admin-password": "node scripts/admin-password.mjs"
+    "admin-password": "node scripts/admin-password.mjs",
+    "set-admin-password": "node scripts/set-admin-password.mjs"
   }
 }
