@@ -46,7 +46,17 @@ export async function onRequestPost({ request, env }) {
 
   // Always run the password check so a wrong email and a wrong password take
   // the same amount of time.
-  const passwordOk = await verifyPassword(password, env.ADMIN_PASSWORD_HASH);
+  let passwordOk;
+  try {
+    passwordOk = await verifyPassword(password, env.ADMIN_PASSWORD_HASH);
+  } catch (error) {
+    console.log("[admin-login] password verification failed:", error && error.name, error && error.message);
+    return fail(
+      503,
+      "Password verification failed on the server. This is a configuration or " +
+        "runtime problem, not an incorrect password. Check the Worker logs."
+    );
+  }
   const emailOk = timingSafeEqual(email, expectedEmail);
 
   if (!passwordOk || !emailOk) return fail(401, "Those details were not recognised.");

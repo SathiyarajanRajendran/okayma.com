@@ -18,7 +18,7 @@
 import { webcrypto as crypto } from "node:crypto";
 import { spawn } from "node:child_process";
 
-const PBKDF2_ITERATIONS = 210000; // must match lib/crypto.js
+const PBKDF2_ITERATIONS = 100000; // must match lib/crypto.js (Workers caps this at 100000)
 const PROJECT = "okayma";
 const SECRET = "ADMIN_PASSWORD_HASH";
 

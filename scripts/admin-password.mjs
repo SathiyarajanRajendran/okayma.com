@@ -10,7 +10,7 @@
 
 import { webcrypto as crypto } from "node:crypto";
 
-const PBKDF2_ITERATIONS = 210000; // must match lib/crypto.js
+const PBKDF2_ITERATIONS = 100000; // must match lib/crypto.js (Workers caps this at 100000)
 
 const password = process.argv[2];
 
