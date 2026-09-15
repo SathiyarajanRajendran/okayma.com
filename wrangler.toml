@@ -1,0 +1,20 @@
+name = "okayma"
+compatibility_date = "2025-07-18"
+pages_build_output_dir = "public"
+
+# Static site lives in public/. API lives in functions/ and is compiled into
+# Cloudflare Pages Functions at deploy time.
+
+[[d1_databases]]
+binding = "DB"
+database_name = "okayma-db"
+database_id = "ea961915-75c8-4c63-892b-538dee038cdf"
+
+[vars]
+SITE_URL = "https://okayma.com"
+MAIL_FROM = "Okayma.com <no-reply@okayma.com>"
+ADMIN_EMAIL = "sathiya@okayma.com"
+
+# Secrets are NOT set here. Set them on the Pages project:
+#   npx wrangler@3 pages secret put RESEND_API_KEY     --project-name=okayma
+#   npx wrangler@3 pages secret put ADMIN_PASSWORD_HASH --project-name=okayma

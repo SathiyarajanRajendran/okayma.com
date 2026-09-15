@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Admin | Okayma.com</title>
+    <meta name="theme-color" content="#101923">
+    <link rel="icon" href="assets/okayma-logo.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="board.css">
+  </head>
+  <body>
+    <!-- Sign-in ---------------------------------------------------------- -->
+    <main class="login-shell" id="login-shell" hidden>
+      <div class="panel">
+        <div class="section-label">Okayma.com</div>
+        <h2>Admin sign-in</h2>
+        <p>Members and submitted ideas are managed here.</p>
+
+        <p class="notice" id="login-notice" role="alert" hidden></p>
+
+        <form id="login-form" novalidate>
+          <div class="field">
+            <label for="login-email">Email address</label>
+            <input id="login-email" name="email" type="email" autocomplete="username" required>
+          </div>
+          <div class="field">
+            <label for="login-password">Password</label>
+            <input id="login-password" name="password" type="password"
+                   autocomplete="current-password" required>
+          </div>
+          <button class="button dark" type="submit" id="login-submit">Sign in</button>
+        </form>
+      </div>
+    </main>
+
+    <!-- Console ---------------------------------------------------------- -->
+    <div id="console" hidden>
+      <header class="site-header solid-header" aria-label="Admin navigation">
+        <a class="brand" href="/" aria-label="Okayma.com home">
+          <img class="brand-mark" src="assets/okayma-logo.svg" alt="">
+          <span>
+            <strong>Okayma.com</strong>
+            <small>Admin console</small>
+          </span>
+        </a>
+        <nav>
+          <a href="/ideas">Ideas board</a>
+          <button class="button small secondary" type="button" id="admin-signout">Sign out</button>
+        </nav>
+      </header>
+
+      <main class="admin-shell">
+        <p class="notice" id="admin-notice" role="status" hidden></p>
+
+        <div class="stat-grid" id="stats"></div>
+
+        <div class="tabs" role="tablist" aria-label="Admin sections">
+          <button class="tab" type="button" role="tab" id="tab-ideas"
+                  aria-controls="panel-ideas" aria-selected="true">Ideas</button>
+          <button class="tab" type="button" role="tab" id="tab-users"
+                  aria-controls="panel-users" aria-selected="false">Members</button>
+        </div>
+
+        <!-- Ideas moderation -->
+        <section id="panel-ideas" role="tabpanel" aria-labelledby="tab-ideas">
+          <div class="toolbar">
+            <label class="sr-only" for="idea-search">Search ideas</label>
+            <input id="idea-search" type="search"
+                   placeholder="Search by title, text, author name or email…">
+            <label class="sr-only" for="idea-status">Filter by status</label>
+            <select id="idea-status">
+              <option value="pending">Awaiting review</option>
+              <option value="">All statuses</option>
+              <option value="approved">Published</option>
+              <option value="rejected">Not published</option>
+            </select>
+          </div>
+
+          <p class="result-count" id="idea-count" role="status"></p>
+          <div id="idea-results"></div>
+          <div class="pager" id="idea-pager" hidden>
+            <button class="button small" type="button" id="idea-prev">Previous</button>
+            <button class="button small" type="button" id="idea-next">Next</button>
+          </div>
+        </section>
+
+        <!-- Member management -->
+        <section id="panel-users" role="tabpanel" aria-labelledby="tab-users" hidden>
+          <div class="toolbar">
+            <label class="sr-only" for="user-search">Search members</label>
+            <input id="user-search" type="search"
+                   placeholder="Search by name, email, phone or title…">
+            <label class="sr-only" for="user-status">Filter by status</label>
+            <select id="user-status">
+              <option value="">All statuses</option>
+              <option value="active">Active</option>
+              <option value="pending">Unconfirmed</option>
+              <option value="suspended">Suspended</option>
+            </select>
+            <label class="sr-only" for="user-sort">Sort by</label>
+            <select id="user-sort">
+              <option value="newest">Newest first</option>
+              <option value="oldest">Oldest first</option>
+              <option value="name">Surname A–Z</option>
+              <option value="ideas">Most ideas</option>
+            </select>
+          </div>
+
+          <p class="result-count" id="user-count" role="status"></p>
+          <div class="table-wrap">
+            <table>
+              <caption class="sr-only">Registered members</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Member</th>
+                  <th scope="col">Contact</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Ideas</th>
+                  <th scope="col">Joined</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="user-rows"></tbody>
+            </table>
+          </div>
+          <div class="pager" id="user-pager" hidden>
+            <button class="button small" type="button" id="user-prev">Previous</button>
+            <button class="button small" type="button" id="user-next">Next</button>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="admin.js" defer></script>
+  </body>
+</html>

@@ -2,10 +2,10 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "okayma-static",
-      "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "8765"],
-      "port": 8765
+      "name": "okayma",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["wrangler@3", "pages", "dev", "--local", "--port", "8788"],
+      "port": 8788
     }
   ]
 }

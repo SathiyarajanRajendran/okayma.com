@@ -5,3 +5,8 @@ desktop.ini
 
 # Local launch runbook (contains personal email; repo is public)
 DEPLOYMENT.md
+
+# Local secrets and build state
+.dev.vars
+.wrangler/
+node_modules/

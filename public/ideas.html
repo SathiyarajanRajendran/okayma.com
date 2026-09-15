@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta
+      name="description"
+      content="Share a business idea with Okayma.com. Register with your email, confirm the link, and post a short idea for review."
+    >
+    <title>Ideas Board | Okayma.com</title>
+    <link rel="canonical" href="https://okayma.com/ideas">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Okayma.com">
+    <meta property="og:url" content="https://okayma.com/ideas">
+    <meta property="og:title" content="Ideas Board | Okayma.com">
+    <meta
+      property="og:description"
+      content="Bring a business idea worth solving. Register, confirm your email, and share it in about 75 words."
+    >
+    <meta property="og:image" content="https://okayma.com/assets/okayma-og.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <meta name="theme-color" content="#101923">
+    <link rel="icon" href="assets/okayma-logo.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="board.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header solid-header" aria-label="Primary navigation">
+      <a class="brand" href="/" aria-label="Okayma.com home">
+        <img class="brand-mark" src="assets/okayma-logo.svg" alt="">
+        <span>
+          <strong>Okayma.com</strong>
+          <small>Shreevaari Consulting Ltd</small>
+        </span>
+      </a>
+      <nav>
+        <a href="/#belief">Belief</a>
+        <a href="/#method">Method</a>
+        <a href="/ideas">Ideas Board</a>
+        <a href="/#contact">Connect</a>
+      </nav>
+    </header>
+
+    <main id="main">
+      <section class="page-band">
+        <div class="section-label">Ideas And Ventures</div>
+        <h1>Ideas Board</h1>
+        <p>
+          Okayma starts from problems worth solving. If you have one — or the idea that answers
+          it — share it here in about 75 words. Confirm your email, post your idea, and it joins
+          the board once it has been reviewed.
+        </p>
+      </section>
+
+      <div class="board-layout">
+        <section aria-labelledby="board-title">
+          <div class="board-head">
+            <h2 id="board-title">Shared ideas</h2>
+            <p class="muted" id="board-count" role="status"></p>
+          </div>
+
+          <div id="board-state" class="empty">Loading ideas…</div>
+          <ul class="idea-list" id="board-list" hidden></ul>
+
+          <div class="pager" id="board-pager" hidden>
+            <button class="button small" type="button" id="board-prev">Newer</button>
+            <button class="button small" type="button" id="board-next">Older</button>
+          </div>
+        </section>
+
+        <aside class="board-aside" aria-labelledby="account-title">
+          <div class="panel" id="account-panel">
+            <p class="notice" id="account-notice" role="status" hidden></p>
+
+            <!-- Signed out: register ------------------------------------ -->
+            <div id="view-register">
+              <h2 id="account-title">Register to post</h2>
+              <p>
+                One confirmation link and you are in. There is no password to create or remember.
+              </p>
+
+              <form id="register-form" novalidate>
+                <div class="field-row">
+                  <div class="field">
+                    <label for="reg-first">First name</label>
+                    <input id="reg-first" name="firstName" autocomplete="given-name" required>
+                    <p class="field-error" id="err-firstName"></p>
+                  </div>
+                  <div class="field">
+                    <label for="reg-last">Last name</label>
+                    <input id="reg-last" name="lastName" autocomplete="family-name" required>
+                    <p class="field-error" id="err-lastName"></p>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label for="reg-title">Title</label>
+                  <input id="reg-title" name="title" autocomplete="organization-title"
+                         placeholder="Solution Architect, Founder, Student…" required>
+                  <p class="field-error" id="err-title"></p>
+                </div>
+
+                <div class="field">
+                  <label for="reg-email">Email address</label>
+                  <input id="reg-email" name="email" type="email" inputmode="email"
+                         autocomplete="email" required>
+                  <p class="hint">The confirmation link is sent here.</p>
+                  <p class="field-error" id="err-email"></p>
+                </div>
+
+                <div class="field">
+                  <label for="reg-phone">Phone number</label>
+                  <input id="reg-phone" name="phone" type="tel" inputmode="tel"
+                         autocomplete="tel" placeholder="+44 7700 900000" required>
+                  <p class="hint">Include the country code. Only the founder ever sees it.</p>
+                  <p class="field-error" id="err-phone"></p>
+                </div>
+
+                <button class="button primary" type="submit" id="register-submit">
+                  Send my confirmation link
+                </button>
+              </form>
+
+              <p class="panel-foot">
+                Already registered?
+                <button class="button link" type="button" id="to-signin">Sign in instead</button>
+              </p>
+            </div>
+
+            <!-- Signed out: sign in ------------------------------------- -->
+            <div id="view-signin" hidden>
+              <h2>Sign in</h2>
+              <p>Enter your email and we will send a one-time sign-in link.</p>
+
+              <form id="signin-form" novalidate>
+                <div class="field">
+                  <label for="signin-email">Email address</label>
+                  <input id="signin-email" name="email" type="email" inputmode="email"
+                         autocomplete="email" required>
+                  <p class="field-error" id="err-signin-email"></p>
+                </div>
+                <button class="button primary" type="submit" id="signin-submit">
+                  Email me a sign-in link
+                </button>
+              </form>
+
+              <p class="panel-foot">
+                New here?
+                <button class="button link" type="button" id="to-register">Register instead</button>
+              </p>
+            </div>
+
+            <!-- Signed in: post an idea --------------------------------- -->
+            <div id="view-post" hidden>
+              <h2>Share an idea</h2>
+              <p id="post-greeting"></p>
+
+              <form id="idea-form" novalidate>
+                <div class="field">
+                  <label for="idea-title">Idea title</label>
+                  <input id="idea-title" name="title" maxlength="120" required>
+                  <p class="field-error" id="err-idea-title"></p>
+                </div>
+
+                <div class="field">
+                  <label for="idea-description">High-level description</label>
+                  <textarea id="idea-description" name="description" required
+                            aria-describedby="idea-count-hint"></textarea>
+                  <p class="hint" id="idea-count-hint">
+                    Aim for about 75 words — <span class="counter" id="idea-count"
+                    data-state="under">0</span> so far (25 to 100 accepted).
+                  </p>
+                  <p class="field-error" id="err-idea-description"></p>
+                </div>
+
+                <button class="button primary" type="submit" id="idea-submit">
+                  Submit for review
+                </button>
+              </form>
+
+              <p class="panel-foot">
+                Signed in as <strong id="post-email"></strong> ·
+                <button class="button link" type="button" id="sign-out">Sign out</button>
+              </p>
+            </div>
+          </div>
+
+          <!-- Signed in: your submissions -------------------------------- -->
+          <div class="panel" id="mine-panel" hidden>
+            <h2>Your ideas</h2>
+            <ul class="idea-list" id="mine-list"></ul>
+          </div>
+        </aside>
+      </div>
+    </main>
+
+    <footer>
+      <p>© 2026 Shreevaari Consulting Ltd. Trading as Okayma.com.</p>
+      <a href="/">Back to the site</a>
+    </footer>
+
+    <script src="ideas.js" defer></script>
+  </body>
+</html>

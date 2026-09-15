@@ -1,0 +1,9 @@
+# Copy to .dev.vars for local development. .dev.vars is gitignored.
+# Generate the hash with: npm run admin-password -- "your chosen password"
+ADMIN_PASSWORD_HASH=
+ADMIN_EMAIL=sathiya@okayma.com
+SITE_URL=http://localhost:8788
+
+# Leave RESEND_API_KEY unset locally — verification links are printed to the
+# terminal instead of being emailed.
+# RESEND_API_KEY=
