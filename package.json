@@ -10,6 +10,7 @@
     "migrate:local": "npx wrangler@3 d1 migrations apply okayma-db --local",
     "migrate:remote": "npx wrangler@3 d1 migrations apply okayma-db --remote",
     "admin-password": "node scripts/admin-password.mjs",
-    "set-admin-password": "node scripts/set-admin-password.mjs"
+    "set-admin-password": "node scripts/set-admin-password.mjs",
+    "set-resend-key": "node scripts/set-resend-key.mjs"
   }
 }
