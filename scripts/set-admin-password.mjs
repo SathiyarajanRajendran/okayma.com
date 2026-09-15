@@ -62,10 +62,13 @@ if (!/^[0-9a-f]{32}\$[0-9a-f]{64}$/.test(value)) {
 
 console.log(`Generated a ${value.length}-character hash. Uploading to Pages project "${PROJECT}"...\n`);
 
+// shell: true is required on Windows — since Node 20.12 spawning a .cmd
+// directly throws EINVAL. Every argument here is a fixed literal, so there is
+// no user input reaching the shell.
 const child = spawn(
-  process.platform === "win32" ? "npx.cmd" : "npx",
+  "npx",
   ["wrangler@3", "pages", "secret", "put", SECRET, `--project-name=${PROJECT}`],
-  { stdio: ["pipe", "inherit", "inherit"] }
+  { stdio: ["pipe", "inherit", "inherit"], shell: true }
 );
 
 // No trailing newline: `echo` would append one and the stored hash would not
