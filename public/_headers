@@ -6,6 +6,9 @@
   Strict-Transport-Security: max-age=31536000; includeSubDomains
   Content-Security-Policy: default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
 
+# Assets and the self-hosted fonts are content-stable. Fonts need no CORS
+# header: they are same-origin, and `rel=preload as=font crossorigin` succeeds
+# same-origin without one.
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
 
@@ -19,6 +22,9 @@
   Cache-Control: public, max-age=0, must-revalidate
 
 /ideas.js
+  Cache-Control: public, max-age=0, must-revalidate
+
+/site.js
   Cache-Control: public, max-age=0, must-revalidate
 
 /admin.js

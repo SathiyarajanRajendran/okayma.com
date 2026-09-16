@@ -29,13 +29,17 @@
 
     <meta name="theme-color" content="#101923">
     <link rel="icon" href="assets/okayma-logo.svg" type="image/svg+xml">
+    <link rel="preload" as="font" type="font/woff2" href="assets/fonts/fraunces-latin.woff2" crossorigin>
+    <link rel="preload" as="font" type="font/woff2" href="assets/fonts/karla-latin.woff2" crossorigin>
     <link rel="preload" as="image" href="assets/okayma-hero.webp">
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
+    <a class="skip-link" href="#belief">Skip to content</a>
+
     <header class="site-header" aria-label="Primary navigation">
       <a class="brand" href="#top" aria-label="Okayma.com home">
-        <img class="brand-mark" src="assets/okayma-logo.svg" alt="">
+        <img class="brand-mark" src="assets/okayma-logo.svg" alt="" width="44" height="44">
         <span>
           <strong>Okayma.com</strong>
           <small>Shreevaari Consulting Ltd</small>
@@ -44,7 +48,7 @@
       <nav>
         <a href="#belief">Belief</a>
         <a href="#method">Method</a>
-        <a href="#ideas">Ideas</a>
+        <a href="#ideas">Ventures</a>
         <a href="/ideas">Ideas Board</a>
         <a href="#contact">Connect</a>
       </nav>
@@ -52,76 +56,106 @@
 
     <main id="top">
       <section class="hero" aria-labelledby="hero-title">
-        <img class="hero-image" src="assets/okayma-hero.webp" width="1754" height="896" fetchpriority="high" alt="Abstract consulting workspace with problem cards, technology notes, and light paths forming a solution.">
+        <img
+          class="hero-image"
+          src="assets/okayma-hero.webp"
+          width="1754"
+          height="896"
+          fetchpriority="high"
+          alt="Abstract consulting workspace with problem cards, technology notes, and light paths forming a solution."
+        >
         <div class="hero-overlay"></div>
         <div class="hero-content">
+          <p class="eyebrow">Shreevaari Consulting Ltd</p>
           <h1 id="hero-title">Okayma.com</h1>
           <p class="hero-lede">
-            A founder-led consulting firm for identifying business problems, shaping practical solutions, building MVPs, and taking useful ideas into the world.
+            A founder-led consultancy that identifies the real business problem, architects a
+            practical solution, builds the MVP, and takes useful ideas out into the world.
           </p>
           <div class="hero-actions" aria-label="Primary actions">
             <a class="button primary" href="#contact">Start a conversation</a>
             <a class="button secondary" href="#method">See the approach</a>
           </div>
         </div>
+        <span class="scroll-cue" aria-hidden="true">Scroll</span>
       </section>
 
       <section id="belief" class="section intro">
-        <div class="section-label">The Belief</div>
-        <div class="intro-copy">
+        <p class="section-label">The Belief</p>
+        <div class="intro-copy reveal">
           <h2>It is okay. Start from the problem. Build from experience.</h2>
           <p>
-            Okayma is built on a simple personal conviction: anything can be approached with calm thinking, honest intent, and the will to find a way. I am not here to prove myself to anyone. I am here to express what I have learned, what I can imagine, and what I can build.
+            Okayma rests on a simple personal conviction: anything can be approached with calm
+            thinking, honest intent, and the will to find a way through. I am not here to prove
+            myself to anyone. I am here to put to work what I have learned, what I can imagine,
+            and what I can build.
           </p>
           <p>
-            After more than 30 years as a Director and Solution Architect, I know the title fits me. Give me 1000 problems and I will use every ability I have to understand them, simplify them, and design a route toward a solution.
+            After more than thirty years as a Director and Solution Architect, I know the title
+            fits. Bring me a thousand problems and I will use every ability I have to understand
+            them, simplify them, and chart a route toward a solution.
           </p>
         </div>
       </section>
 
       <section id="method" class="section method">
-        <div class="section-label">How Okayma Works</div>
-        <div class="method-grid">
+        <p class="section-label">How Okayma Works</p>
+        <div class="method-grid reveal">
           <article>
             <span class="step">01</span>
             <h3>Identify the real business problem</h3>
-            <p>Look past surface symptoms, listen carefully, and define the problem in a way people can act on.</p>
+            <p>
+              Look past the presenting symptoms, listen closely, and define the problem in terms
+              people can actually act on.
+            </p>
           </article>
           <article>
             <span class="step">02</span>
             <h3>Architect a practical solution</h3>
-            <p>Use experience, technology knowledge, judgement, and out-of-box thinking to form a clear path forward.</p>
+            <p>
+              Bring experience, technical depth, judgement, and out-of-the-box thinking together
+              into a clear path forward.
+            </p>
           </article>
           <article>
             <span class="step">03</span>
             <h3>Create an MVP</h3>
-            <p>Turn the idea into something visible, testable, and useful enough to invite feedback and support.</p>
+            <p>
+              Turn the idea into something visible, testable, and useful enough to invite genuine
+              feedback and support.
+            </p>
           </article>
           <article>
             <span class="step">04</span>
             <h3>Take it to the world</h3>
-            <p>Welcome the right people from my network or beyond, then work together to grow the idea with purpose.</p>
+            <p>
+              Welcome the right people, from my network or well beyond it, then grow the idea
+              together with purpose.
+            </p>
           </article>
         </div>
       </section>
 
       <section id="ideas" class="section split">
         <div>
-          <div class="section-label">Ideas And Ventures</div>
+          <p class="section-label">Ideas And Ventures</p>
           <h2>Okayma is a place for independent thinking.</h2>
         </div>
-        <div class="split-copy">
+        <div class="split-copy reveal">
           <p>
-            This company is where I will idealise my views, shape business ideas, build proof points, and share them openly. Some ideas may become products. Some may become partnerships. Some may simply open a better conversation.
+            This company is where I will shape my views into business ideas, build the proof
+            points behind them, and share the results openly. Some ideas may become products.
+            Some may become partnerships. Some may simply open a better conversation.
           </p>
           <p>
-            The work starts with curiosity and becomes valuable when it solves something real.
+            The work begins with curiosity, and becomes valuable the moment it solves something
+            real.
           </p>
           <p>
             You do not have to watch from the outside. If you have a business problem worth
-            solving, or an idea that answers one, share it on the ideas board in about 75 words.
-            Register with your email, confirm the link, and your idea joins the board once it has
-            been reviewed.
+            solving, or an idea that answers one, share it on the ideas board in about seventy-five
+            words. Register with your email address, confirm the link, and your idea joins the
+            board once it has been reviewed.
           </p>
           <div class="hero-actions">
             <a class="button primary" href="/ideas">Share an idea</a>
@@ -137,14 +171,16 @@
       </section>
 
       <section id="contact" class="section contact">
-        <div>
-          <div class="section-label">Collaborate</div>
+        <div class="reveal">
+          <p class="section-label">Collaborate</p>
           <h2>Bring a problem, an idea, or the will to back one.</h2>
           <p>
-            If you see potential in an Okayma idea, or you have a business problem worth solving, let us talk. I welcome collaborators, clients, sponsors, builders, and thoughtful people from any network.
+            If you see potential in an Okayma idea, or you have a business problem worth solving,
+            let us talk. I welcome collaborators, clients, sponsors, builders, and thoughtful
+            people from any network.
           </p>
         </div>
-        <div class="contact-panel">
+        <div class="contact-panel reveal">
           <p class="panel-title">Okayma.com</p>
           <p>Trading name of Shreevaari Consulting Ltd</p>
           <a class="contact-link" href="mailto:sathiya@okayma.com">sathiya@okayma.com</a>
@@ -156,5 +192,7 @@
       <p>© 2026 Shreevaari Consulting Ltd. Trading as Okayma.com.</p>
       <a href="#top">Back to top</a>
     </footer>
+
+    <script src="site.js" defer></script>
   </body>
 </html>

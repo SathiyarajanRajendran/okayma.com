@@ -1,10 +1,13 @@
 /* Ideas board — registration, passwordless sign-in, and idea submission.
-   No inline script anywhere, so the page keeps a strict script-src 'self' CSP. */
+   No inline script anywhere, so the page keeps a strict script-src 'self' CSP.
+   Every view is built with DOM APIs, never innerHTML, so member-supplied text
+   can never become markup. */
 
 (function () {
   "use strict";
 
   var WORD_MIN = 25;
+  var WORD_TARGET = 75;
   var WORD_MAX = 100;
   var page = 1;
 
@@ -21,11 +24,11 @@
     el.textContent = message || "";
     el.setAttribute("data-tone", tone || "success");
     show(el, Boolean(message));
-    if (message) el.scrollIntoView({ block: "nearest" });
+    if (message) el.scrollIntoView({ block: "nearest", behavior: "smooth" });
   }
 
-  function clearErrors(scope) {
-    var node = typeof scope === "string" ? $(scope) : scope;
+  function clearErrors(scopeId) {
+    var node = $(scopeId);
     if (!node) return;
     node.querySelectorAll(".field-error").forEach(function (p) {
       p.textContent = "";
@@ -70,15 +73,14 @@
     });
   }
 
-  function busy(button, isBusy, restingLabel) {
+  // Keeps the label in place and swaps in a spinner, so the button never
+  // changes width mid-submit.
+  function busy(button, isBusy) {
     if (!button) return;
     button.disabled = isBusy;
-    if (isBusy) {
-      button.dataset.label = button.textContent;
-      button.textContent = "Working…";
-    } else {
-      button.textContent = restingLabel || button.dataset.label || button.textContent;
-    }
+    button.classList.toggle("is-busy", isBusy);
+    if (isBusy) button.setAttribute("aria-busy", "true");
+    else button.removeAttribute("aria-busy");
   }
 
   function formValues(form) {
@@ -92,16 +94,21 @@
   function formatDate(iso) {
     if (!iso) return "";
     var d = new Date(iso);
-    return isNaN(d) ? "" : d.toLocaleDateString(undefined, {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
+    return isNaN(d)
+      ? ""
+      : d.toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
   }
 
   function countWords(text) {
     var trimmed = String(text || "").trim();
     return trimmed ? trimmed.split(/\s+/).length : 0;
+  }
+
+  function el(tag, className, text) {
+    var node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text !== undefined && text !== null) node.textContent = text;
+    return node;
   }
 
   /* Public board ---------------------------------------------------------- */
@@ -111,40 +118,37 @@
     var state = $("board-state");
     list.textContent = "";
 
+    show($("board-skeleton"), false);
+
     if (!payload.ideas.length) {
       show(list, false);
       show($("board-pager"), false);
-      state.textContent =
-        page > 1 ? "No more ideas on this page." : "No ideas have been published yet. Yours could be the first.";
+      state.textContent = "";
+      if (page > 1) {
+        state.append(el("strong", null, "Nothing further back"), el("p", null, "There are no older ideas on this page."));
+      } else {
+        state.append(
+          el("strong", null, "No ideas published yet"),
+          el("p", null, "The board is open. Yours could be the first.")
+        );
+      }
       show(state, true);
+      $("board-status").textContent = "No ideas to show.";
       return;
     }
 
     payload.ideas.forEach(function (idea) {
-      var item = document.createElement("li");
-      item.className = "idea-card";
+      var item = el("li", "idea-card reveal");
 
-      var heading = document.createElement("h3");
-      heading.textContent = idea.title;
+      item.append(el("h3", null, idea.title), el("p", null, idea.description));
 
-      var body = document.createElement("p");
-      body.textContent = idea.description;
-
-      var meta = document.createElement("div");
-      meta.className = "idea-meta";
-
-      var author = document.createElement("span");
-      author.className = "idea-author";
-      author.textContent = idea.author;
-
-      var role = document.createElement("span");
-      role.textContent = idea.authorTitle;
-
-      var when = document.createElement("span");
-      when.textContent = formatDate(idea.createdAt);
-
-      meta.append(author, role, when);
-      item.append(heading, body, meta);
+      var meta = el("div", "idea-meta");
+      meta.append(
+        el("span", "idea-author", idea.author),
+        el("span", null, idea.authorTitle),
+        el("span", null, formatDate(idea.createdAt))
+      );
+      item.append(meta);
       list.append(item);
     });
 
@@ -154,17 +158,35 @@
     $("board-prev").disabled = page <= 1;
     $("board-next").disabled = !payload.hasMore;
     $("board-count").textContent = "Page " + page;
+    $("board-status").textContent = payload.ideas.length + " ideas shown.";
+
+    if (typeof window.okaymaReveal === "function") window.okaymaReveal(list);
   }
 
   function loadBoard() {
-    return api("/api/ideas?page=" + page).then(function (result) {
-      if (!result.ok) {
-        $("board-state").textContent = "The ideas board could not be loaded. Please refresh.";
-        show($("board-state"), true);
-        return;
-      }
-      renderBoard(result.data);
-    });
+    return api("/api/ideas?page=" + page)
+      .then(function (result) {
+        if (!result.ok) {
+          show($("board-skeleton"), false);
+          show($("board-list"), false);
+          var state = $("board-state");
+          state.textContent = "";
+          state.append(
+            el("strong", null, "The board could not be loaded"),
+            el("p", null, "Please refresh the page and try again.")
+          );
+          show(state, true);
+          return;
+        }
+        renderBoard(result.data);
+        if (page === 1) {
+          var n = result.data.ideas.length;
+          $("stat-published").textContent = result.data.hasMore ? n + "+" : String(n);
+        }
+      })
+      .catch(function () {
+        show($("board-skeleton"), false);
+      });
   }
 
   /* Account state --------------------------------------------------------- */
@@ -181,7 +203,7 @@
     show($("view-signin"), false);
     show($("view-post"), true);
     $("post-greeting").textContent =
-      "Welcome back, " + user.firstName + ". Ideas are reviewed before they appear on the board.";
+      "Welcome back, " + user.firstName + ". Every idea is reviewed before it appears on the board.";
     $("post-email").textContent = user.email;
     loadMine();
   }
@@ -209,30 +231,23 @@
       }
 
       result.data.ideas.forEach(function (idea) {
-        var item = document.createElement("li");
-        item.className = "idea-card";
+        var item = el("li", "idea-card");
+        item.append(el("h3", null, idea.title));
 
-        var heading = document.createElement("h3");
-        heading.textContent = idea.title;
-
-        var meta = document.createElement("div");
-        meta.className = "idea-meta";
-
-        var tag = document.createElement("span");
-        tag.className = "tag";
-        tag.setAttribute("data-status", idea.status);
-        tag.textContent =
+        var meta = el("div", "idea-meta");
+        var tag = el(
+          "span",
+          "tag",
           idea.status === "approved"
             ? "Published"
             : idea.status === "rejected"
             ? "Not published"
-            : "In review";
+            : "In review"
+        );
+        tag.setAttribute("data-status", idea.status);
 
-        var when = document.createElement("span");
-        when.textContent = "Submitted " + formatDate(idea.createdAt);
-
-        meta.append(tag, when);
-        item.append(heading, meta);
+        meta.append(tag, el("span", null, "Submitted " + formatDate(idea.createdAt)));
+        item.append(meta);
         list.append(item);
       });
 
@@ -264,7 +279,7 @@
           notice("Could not reach the server. Please check your connection.", "error");
         })
         .finally(function () {
-          busy($("register-submit"), false, "Send my confirmation link");
+          busy($("register-submit"), false);
         });
     });
   }
@@ -294,23 +309,38 @@
           notice("Could not reach the server. Please check your connection.", "error");
         })
         .finally(function () {
-          busy($("signin-submit"), false, "Email me a sign-in link");
+          busy($("signin-submit"), false);
         });
     });
+  }
+
+  // The bare number never conveyed how close 75 words was. The track fills
+  // toward the maximum with a marker at the target, so the writer can aim.
+  function updateMeter(words) {
+    var state = words < WORD_MIN ? "under" : words > WORD_MAX ? "over" : "ok";
+    var pct = Math.min(100, (words / WORD_MAX) * 100);
+
+    $("meter-fill").style.width = pct + "%";
+    $("meter-track").setAttribute("data-state", state);
+
+    var counter = $("idea-count");
+    counter.textContent = String(words);
+    counter.setAttribute("data-state", state);
+
+    $("idea-count-label").textContent =
+      state === "under"
+        ? "words. At least " + WORD_MIN + " needed, " + WORD_TARGET + " is the sweet spot."
+        : state === "over"
+        ? "words. That is past the " + WORD_MAX + "-word limit."
+        : "words. Comfortably in range.";
   }
 
   function wireIdeaForm() {
     var form = $("idea-form");
     var description = $("idea-description");
-    var counter = $("idea-count");
 
     description.addEventListener("input", function () {
-      var words = countWords(description.value);
-      counter.textContent = String(words);
-      counter.setAttribute(
-        "data-state",
-        words < WORD_MIN ? "under" : words > WORD_MAX ? "over" : "ok"
-      );
+      updateMeter(countWords(description.value));
     });
 
     form.addEventListener("submit", function (event) {
@@ -323,8 +353,7 @@
         .then(function (result) {
           if (result.ok) {
             form.reset();
-            counter.textContent = "0";
-            counter.setAttribute("data-state", "under");
+            updateMeter(0);
             notice(result.data.message, "success");
             loadMine();
             return;
@@ -341,7 +370,7 @@
           notice("Could not reach the server. Please check your connection.", "error");
         })
         .finally(function () {
-          busy($("idea-submit"), false, "Submit for review");
+          busy($("idea-submit"), false);
         });
     });
   }
@@ -372,12 +401,14 @@
       if (page > 1) {
         page -= 1;
         loadBoard();
+        $("board-title").scrollIntoView({ block: "start", behavior: "smooth" });
       }
     });
 
     $("board-next").addEventListener("click", function () {
       page += 1;
       loadBoard();
+      $("board-title").scrollIntoView({ block: "start", behavior: "smooth" });
     });
   }
 
@@ -392,10 +423,7 @@
     } else if (state === "signed-in") {
       notice("You are signed in.", "success");
     } else if (state === "invalid") {
-      notice(
-        "That link has expired or has already been used. Request a new one below.",
-        "error"
-      );
+      notice("That link has expired or has already been used. Please request a new one below.", "error");
     } else if (state === "suspended") {
       notice("That account cannot be used at the moment. Please get in touch.", "error");
     }
