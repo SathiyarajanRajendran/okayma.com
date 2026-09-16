@@ -23,6 +23,8 @@
 
     <meta name="theme-color" content="#101923">
     <link rel="icon" href="assets/okayma-logo.svg" type="image/svg+xml">
+    <link rel="preload" as="font" type="font/woff2" href="assets/fonts/fraunces-latin.woff2" crossorigin>
+    <link rel="preload" as="font" type="font/woff2" href="assets/fonts/karla-latin.woff2" crossorigin>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="board.css">
   </head>
@@ -31,7 +33,7 @@
 
     <header class="site-header solid-header" aria-label="Primary navigation">
       <a class="brand" href="/" aria-label="Okayma.com home">
-        <img class="brand-mark" src="assets/okayma-logo.svg" alt="">
+        <img class="brand-mark" src="assets/okayma-logo.svg" alt="" width="44" height="44">
         <span>
           <strong>Okayma.com</strong>
           <small>Shreevaari Consulting Ltd</small>
@@ -47,13 +49,28 @@
 
     <main id="main">
       <section class="page-band">
-        <div class="section-label">Ideas And Ventures</div>
+        <p class="section-label">Ideas And Ventures</p>
         <h1>Ideas Board</h1>
         <p>
-          Okayma starts from problems worth solving. If you have one — or the idea that answers
-          it — share it here in about 75 words. Confirm your email, post your idea, and it joins
-          the board once it has been reviewed.
+          Okayma begins with problems worth solving. If you have one — or the idea that answers
+          it — set it out here in about seventy-five words. Confirm your email address, submit
+          your idea, and it joins the board once it has been reviewed.
         </p>
+
+        <div class="band-stats" id="band-stats" aria-label="Board summary">
+          <div class="band-stat">
+            <strong id="stat-published" aria-live="polite">—</strong>
+            <span>Ideas published</span>
+          </div>
+          <div class="band-stat">
+            <strong>~75</strong>
+            <span>Words per idea</span>
+          </div>
+          <div class="band-stat">
+            <strong>24h</strong>
+            <span>Confirmation link</span>
+          </div>
+        </div>
       </section>
 
       <div class="board-layout">
@@ -63,12 +80,29 @@
             <p class="muted" id="board-count" role="status"></p>
           </div>
 
-          <div id="board-state" class="empty">Loading ideas…</div>
+          <!-- Skeletons stand in until the first fetch resolves. -->
+          <div id="board-skeleton" class="idea-list" aria-hidden="true">
+            <div class="skeleton">
+              <div class="skeleton-line title"></div>
+              <div class="skeleton-line"></div>
+              <div class="skeleton-line"></div>
+              <div class="skeleton-line short"></div>
+            </div>
+            <div class="skeleton">
+              <div class="skeleton-line title"></div>
+              <div class="skeleton-line"></div>
+              <div class="skeleton-line"></div>
+              <div class="skeleton-line short"></div>
+            </div>
+          </div>
+
+          <p class="sr-only" id="board-status" role="status">Loading ideas.</p>
+          <div id="board-state" class="empty" hidden></div>
           <ul class="idea-list" id="board-list" hidden></ul>
 
           <div class="pager" id="board-pager" hidden>
-            <button class="button small" type="button" id="board-prev">Newer</button>
-            <button class="button small" type="button" id="board-next">Older</button>
+            <button class="button quiet small" type="button" id="board-prev">← Newer</button>
+            <button class="button quiet small" type="button" id="board-next">Older →</button>
           </div>
         </section>
 
@@ -80,7 +114,7 @@
             <div id="view-register">
               <h2 id="account-title">Register to post</h2>
               <p>
-                One confirmation link and you are in. There is no password to create or remember.
+                One confirmation link and you are in. There is no password to choose or remember.
               </p>
 
               <form id="register-form" novalidate>
@@ -108,7 +142,7 @@
                   <label for="reg-email">Email address</label>
                   <input id="reg-email" name="email" type="email" inputmode="email"
                          autocomplete="email" required>
-                  <p class="hint">The confirmation link is sent here.</p>
+                  <p class="hint">Your confirmation link is sent here.</p>
                   <p class="field-error" id="err-email"></p>
                 </div>
 
@@ -116,7 +150,10 @@
                   <label for="reg-phone">Phone number</label>
                   <input id="reg-phone" name="phone" type="tel" inputmode="tel"
                          autocomplete="tel" placeholder="+44 7700 900000" required>
-                  <p class="hint">Include the country code. Only the founder ever sees it.</p>
+                  <p class="hint">
+                    Please include the country code. Your number is never shown on the board —
+                    only the founder sees it.
+                  </p>
                   <p class="field-error" id="err-phone"></p>
                 </div>
 
@@ -134,7 +171,7 @@
             <!-- Signed out: sign in ------------------------------------- -->
             <div id="view-signin" hidden>
               <h2>Sign in</h2>
-              <p>Enter your email and we will send a one-time sign-in link.</p>
+              <p>Enter your email address and we will send a single-use sign-in link.</p>
 
               <form id="signin-form" novalidate>
                 <div class="field">
@@ -162,17 +199,32 @@
               <form id="idea-form" novalidate>
                 <div class="field">
                   <label for="idea-title">Idea title</label>
-                  <input id="idea-title" name="title" maxlength="120" required>
+                  <input id="idea-title" name="title" maxlength="120" required
+                         placeholder="Name the idea in a few words">
                   <p class="field-error" id="err-idea-title"></p>
                 </div>
 
                 <div class="field">
                   <label for="idea-description">High-level description</label>
                   <textarea id="idea-description" name="description" required
+                            placeholder="What is the problem, and what would answer it?"
                             aria-describedby="idea-count-hint"></textarea>
+
+                  <div class="meter" aria-hidden="true">
+                    <div class="meter-track" id="meter-track" data-state="under">
+                      <div class="meter-fill" id="meter-fill"></div>
+                      <div class="meter-target"></div>
+                    </div>
+                    <div class="meter-legend">
+                      <span>25 minimum</span>
+                      <span>75 target</span>
+                      <span>100 maximum</span>
+                    </div>
+                  </div>
+
                   <p class="hint" id="idea-count-hint">
-                    Aim for about 75 words — <span class="counter" id="idea-count"
-                    data-state="under">0</span> so far (25 to 100 accepted).
+                    <span class="counter" id="idea-count" data-state="under">0</span>
+                    <span id="idea-count-label">words. Aim for about 75.</span>
                   </p>
                   <p class="field-error" id="err-idea-description"></p>
                 </div>
@@ -203,6 +255,7 @@
       <a href="/">Back to the site</a>
     </footer>
 
+    <script src="site.js" defer></script>
     <script src="ideas.js" defer></script>
   </body>
 </html>

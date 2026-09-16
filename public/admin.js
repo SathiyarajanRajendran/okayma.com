@@ -75,7 +75,8 @@
 
       var button = $("login-submit");
       button.disabled = true;
-      button.textContent = "Signing in…";
+      button.classList.add("is-busy");
+      button.setAttribute("aria-busy", "true");
 
       api("/api/admin/login", {
         method: "POST",
@@ -99,7 +100,8 @@
         })
         .finally(function () {
           button.disabled = false;
-          button.textContent = "Sign in";
+          button.classList.remove("is-busy");
+          button.removeAttribute("aria-busy");
         });
     });
 
@@ -130,15 +132,18 @@
       var grid = $("stats");
       grid.textContent = "";
 
+      // The accent stripe draws the eye to the queue that needs working.
       [
-        ["Awaiting review", result.data.ideas.pending],
-        ["Published ideas", result.data.ideas.approved],
-        ["Active members", result.data.users.active],
-        ["Unconfirmed", result.data.users.pending],
-        ["Suspended", result.data.users.suspended],
-      ].forEach(function (pair) {
+        ["Awaiting review", result.data.ideas.pending, "attention"],
+        ["Published ideas", result.data.ideas.approved, "good"],
+        ["Active members", result.data.users.active, "good"],
+        ["Unconfirmed", result.data.users.pending, null],
+        ["Suspended", result.data.users.suspended, "warn"],
+      ].forEach(function (row) {
         var card = el("div", "stat");
-        card.append(el("strong", null, String(pair[1])), el("span", null, pair[0]));
+        // Zero needs no accent: an empty queue is not something to flag.
+        if (row[2] && row[1] > 0) card.setAttribute("data-accent", row[2]);
+        card.append(el("strong", null, String(row[1])), el("span", null, row[0]));
         grid.append(card);
       });
     });
@@ -190,7 +195,12 @@
       : "";
 
     if (!payload.ideas.length) {
-      wrap.append(el("div", "empty", "Nothing matches these filters."));
+      var blank = el("div", "empty");
+      blank.append(
+        el("strong", null, "Nothing to review"),
+        el("p", null, "No ideas match these filters.")
+      );
+      wrap.append(blank);
       show($("idea-pager"), false);
       return;
     }
@@ -220,7 +230,7 @@
       var actions = el("div", "stack");
 
       if (idea.status !== "approved") {
-        var approve = el("button", "button small primary", "Publish");
+        var approve = el("button", "button primary small", "Publish");
         approve.type = "button";
         approve.addEventListener("click", function () {
           decide(idea.id, "approved", true);
@@ -229,7 +239,7 @@
       }
 
       if (idea.status !== "rejected") {
-        var reject = el("button", "button small", "Do not publish");
+        var reject = el("button", "button quiet small", "Do not publish");
         reject.type = "button";
         reject.addEventListener("click", function () {
           decide(idea.id, "rejected", true);
@@ -238,7 +248,7 @@
       }
 
       if (idea.status !== "pending") {
-        var reopen = el("button", "button small", "Back to review");
+        var reopen = el("button", "button quiet small", "Back to review");
         reopen.type = "button";
         reopen.addEventListener("click", function () {
           decide(idea.id, "pending", false);
@@ -246,7 +256,7 @@
         actions.append(reopen);
       }
 
-      var del = el("button", "button small", "Delete");
+      var del = el("button", "button quiet small", "Delete");
       del.type = "button";
       del.addEventListener("click", function () {
         removeIdea(idea.id, idea.title);
@@ -367,14 +377,14 @@
       var stack = el("div", "stack");
 
       if (user.status === "suspended") {
-        var restore = el("button", "button small", "Reactivate");
+        var restore = el("button", "button quiet small", "Reactivate");
         restore.type = "button";
         restore.addEventListener("click", function () {
           setUserStatus(user.id, "active", name);
         });
         stack.append(restore);
       } else if (user.status === "active") {
-        var suspend = el("button", "button small", "Suspend");
+        var suspend = el("button", "button quiet small", "Suspend");
         suspend.type = "button";
         suspend.addEventListener("click", function () {
           setUserStatus(user.id, "suspended", name);
@@ -382,7 +392,7 @@
         stack.append(suspend);
       }
 
-      var del = el("button", "button small", "Delete");
+      var del = el("button", "button quiet small", "Delete");
       del.type = "button";
       del.addEventListener("click", function () {
         removeUser(user.id, name);

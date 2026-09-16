@@ -7,6 +7,8 @@
     <title>Admin | Okayma.com</title>
     <meta name="theme-color" content="#101923">
     <link rel="icon" href="assets/okayma-logo.svg" type="image/svg+xml">
+    <link rel="preload" as="font" type="font/woff2" href="assets/fonts/fraunces-latin.woff2" crossorigin>
+    <link rel="preload" as="font" type="font/woff2" href="assets/fonts/karla-latin.woff2" crossorigin>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="board.css">
   </head>
@@ -14,9 +16,9 @@
     <!-- Sign-in ---------------------------------------------------------- -->
     <main class="login-shell" id="login-shell" hidden>
       <div class="panel">
-        <div class="section-label">Okayma.com</div>
+        <p class="section-label">Okayma.com</p>
         <h2>Admin sign-in</h2>
-        <p>Members and submitted ideas are managed here.</p>
+        <p>Members and submitted ideas are reviewed and managed here.</p>
 
         <p class="notice" id="login-notice" role="alert" hidden></p>
 
@@ -47,7 +49,7 @@
         </a>
         <nav>
           <a href="/ideas">Ideas board</a>
-          <button class="button small secondary" type="button" id="admin-signout">Sign out</button>
+          <button class="button secondary small" type="button" id="admin-signout">Sign out</button>
         </nav>
       </header>
 
@@ -81,8 +83,8 @@
           <p class="result-count" id="idea-count" role="status"></p>
           <div id="idea-results"></div>
           <div class="pager" id="idea-pager" hidden>
-            <button class="button small" type="button" id="idea-prev">Previous</button>
-            <button class="button small" type="button" id="idea-next">Next</button>
+            <button class="button quiet small" type="button" id="idea-prev">← Previous</button>
+            <button class="button quiet small" type="button" id="idea-next">Next →</button>
           </div>
         </section>
 
@@ -126,13 +128,14 @@
             </table>
           </div>
           <div class="pager" id="user-pager" hidden>
-            <button class="button small" type="button" id="user-prev">Previous</button>
-            <button class="button small" type="button" id="user-next">Next</button>
+            <button class="button quiet small" type="button" id="user-prev">← Previous</button>
+            <button class="button quiet small" type="button" id="user-next">Next →</button>
           </div>
         </section>
       </main>
     </div>
 
+    <script src="site.js" defer></script>
     <script src="admin.js" defer></script>
   </body>
 </html>

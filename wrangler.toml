@@ -1,3 +1,17 @@
+# THIS IS A CLOUDFLARE **PAGES** PROJECT, NOT A WORKER.
+#
+# Deploy with `npm run deploy` (wrangler pages deploy). A plain
+# `wrangler deploy` will always fail here, by design:
+#
+#   It looks like you've run a Workers-specific command in a Pages project.
+#   For Pages, please run `wrangler pages deploy` instead.
+#
+# If CI reports a failing "Workers Builds" check against this repo, the repo is
+# not the problem — a Workers service has been pointed at it and is running the
+# wrong deploy command. Fix that in the Cloudflare dashboard. Do NOT convert
+# this file into a Workers config to silence the check: that would break the
+# Pages deployment which actually serves okayma.com.
+
 name = "okayma"
 compatibility_date = "2025-07-18"
 pages_build_output_dir = "public"
