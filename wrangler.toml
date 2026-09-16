@@ -1,7 +1,11 @@
 # THIS IS A CLOUDFLARE **PAGES** PROJECT, NOT A WORKER.
 #
-# Deploy with `npm run deploy` (wrangler pages deploy). A plain
-# `wrangler deploy` will always fail here, by design:
+# Deploys happen on `git push` to main: the Pages project is Git-connected.
+# `npm run deploy` (wrangler pages deploy) still works and is kept for
+# emergencies only -- a manual upload and a Git build both publish to
+# production, and whichever ran last wins.
+#
+# A plain `wrangler deploy` will always fail here, by design:
 #
 #   It looks like you've run a Workers-specific command in a Pages project.
 #   For Pages, please run `wrangler pages deploy` instead.
