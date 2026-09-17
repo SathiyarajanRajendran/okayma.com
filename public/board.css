@@ -5,46 +5,6 @@
   display: none !important;
 }
 
-/* Page band --------------------------------------------------------------- */
-
-.page-band {
-  position: relative;
-  overflow: hidden;
-  padding: clamp(46px, 6vw, 78px) var(--gutter) clamp(46px, 6vw, 72px);
-  color: var(--paper-raised);
-  background: var(--ink);
-}
-
-.page-band::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(70% 130% at 88% 0%, rgba(197, 154, 70, 0.22), transparent 60%),
-    radial-gradient(60% 120% at 4% 100%, rgba(20, 119, 122, 0.24), transparent 62%);
-}
-
-.page-band > * {
-  position: relative;
-}
-
-.page-band .section-label {
-  color: var(--gold);
-}
-
-.page-band h1 {
-  margin-bottom: 18px;
-  font-size: clamp(2.7rem, 7vw, 5.2rem);
-}
-
-.page-band p {
-  max-width: 62ch;
-  margin: 0;
-  color: rgba(255, 253, 248, 0.8);
-  font-size: clamp(1.02rem, 1.5vw, 1.18rem);
-  line-height: 1.6;
-}
-
 /* A quiet metrics rule under the intro — counts only, no claims. */
 .band-stats {
   display: flex;
@@ -662,11 +622,6 @@ button {
 
 /* Admin console ----------------------------------------------------------- */
 
-.solid-header {
-  position: static;
-  background: var(--ink);
-}
-
 .admin-shell {
   padding: clamp(28px, 4vw, 52px) var(--gutter) clamp(48px, 6vw, 80px);
 }
@@ -907,17 +862,6 @@ td .stack {
 
   .board-aside {
     position: static;
-  }
-}
-
-@media (max-width: 920px) {
-  .solid-header {
-    position: static;
-    align-items: center;
-  }
-
-  .solid-header nav {
-    display: flex;
   }
 }
 
