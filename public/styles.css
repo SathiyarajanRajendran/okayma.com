@@ -811,7 +811,7 @@ cite::before {
   display: block;
   width: 100%;
   height: auto;
-  aspect-ratio: 1;
+  aspect-ratio: 3 / 4;
   object-fit: cover;
   border-radius: var(--radius-sm);
   background: var(--paper-sunk);
