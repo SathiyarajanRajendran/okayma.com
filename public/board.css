@@ -882,3 +882,198 @@ td .stack {
     line-height: 1.8;
   }
 }
+
+/* Stage badge (public board) ----------------------------------------------- */
+
+.stage-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  align-self: flex-start;
+  margin-bottom: 14px;
+  padding: 5px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--paper-sunk);
+  color: var(--ink-soft);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.stage-badge::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ink-mute);
+}
+
+.stage-badge[data-stage="design"]::before,
+.stage-badge[data-stage="development"]::before {
+  background: var(--teal);
+}
+
+.stage-badge[data-stage="investment"]::before,
+.stage-badge[data-stage="marketing"]::before {
+  background: var(--gold);
+}
+
+.stage-badge[data-stage="launched"] {
+  border-color: rgba(20, 119, 122, 0.4);
+  background: rgba(20, 119, 122, 0.08);
+  color: var(--teal-deep);
+}
+
+.stage-badge[data-stage="launched"]::before {
+  background: var(--teal-deep);
+}
+
+.stage-badge[data-stage="on_hold"]::before,
+.stage-badge[data-stage="archived"]::before {
+  background: var(--coral);
+}
+
+/* Pipeline (admin dashboard) ----------------------------------------------- */
+
+.pipeline {
+  margin: 26px 0 8px;
+}
+
+.pipeline-title {
+  margin: 0 0 4px;
+  font-family: var(--text);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+
+.pipeline-hint {
+  margin: 0 0 14px;
+  color: var(--ink-mute);
+  font-size: 0.86rem;
+}
+
+/* Scrolls rather than wraps: the order of the stages is the information, and
+   a wrapped row reads as two pipelines rather than one. */
+.pipeline-track {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+
+.pipeline-step {
+  display: grid;
+  gap: 3px;
+  flex: 1 0 118px;
+  padding: 13px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--paper-raised);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.25s var(--ease), transform 0.2s var(--ease),
+    background-color 0.25s var(--ease);
+}
+
+.pipeline-step:hover {
+  border-color: var(--line-strong);
+  transform: translateY(-2px);
+}
+
+.pipeline-step strong {
+  font-family: var(--display);
+  font-size: 1.6rem;
+  font-weight: 500;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.pipeline-step span {
+  color: var(--ink-mute);
+  font-size: 0.78rem;
+  line-height: 1.3;
+}
+
+.pipeline-step[data-filled="true"] {
+  border-color: rgba(20, 119, 122, 0.38);
+  background: rgba(20, 119, 122, 0.06);
+}
+
+/* On-hold and archived are not progress, so they never take the accent. */
+.pipeline-step[data-off="true"][data-filled="true"] {
+  border-color: rgba(214, 95, 74, 0.34);
+  background: rgba(214, 95, 74, 0.06);
+}
+
+.pipeline-step[data-off="true"] strong {
+  color: var(--ink-mute);
+}
+
+/* Stage control (admin idea card) ------------------------------------------ */
+
+.stage-control {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 0 4px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.stage-control label {
+  margin: 0;
+  color: var(--ink-mute);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.stage-control select {
+  width: auto;
+  min-width: 165px;
+}
+
+.stage-moved {
+  color: var(--ink-mute);
+  font-size: 0.82rem;
+}
+
+/* Testimonial submission --------------------------------------------------- */
+
+.testimonial-form-section {
+  background: var(--paper-sunk);
+  border-block: 1px solid var(--line);
+}
+
+.testimonial-form-head {
+  max-width: 68ch;
+  margin-bottom: clamp(24px, 3.4vw, 38px);
+}
+
+.testimonial-form-head h2 {
+  margin-bottom: 16px;
+}
+
+.testimonial-form-head p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: clamp(1.02rem, 1.35vw, 1.14rem);
+  line-height: 1.68;
+}
+
+.testimonial-form-panel {
+  max-width: 820px;
+}
+
+.page-notice {
+  margin: 0 var(--gutter);
+  transform: translateY(-50%);
+}

@@ -124,6 +124,224 @@
     return result.ok;
   }
 
+  /* Testimonials ---------------------------------------------------------- */
+
+  var testimonialPage = 1;
+
+  function decideTestimonial(id, status) {
+    return api("/api/admin/testimonials/" + encodeURIComponent(id), {
+      method: "PATCH",
+      body: { status: status, notify: true },
+    }).then(function (result) {
+      if (!guard(result)) {
+        notice(result.data.error || "That change did not save.", "error");
+        return;
+      }
+      notice(
+        status === "published"
+          ? "Published." + (result.data.notified ? " The author has been emailed." : "")
+          : status === "rejected"
+          ? "Marked as not published." +
+            (result.data.notified ? " The author has been emailed." : "")
+          : "Moved back to the review queue.",
+        "success"
+      );
+      loadTestimonials();
+      loadStats();
+    });
+  }
+
+  function removeTestimonial(id, name) {
+    if (!window.confirm("Permanently delete the testimonial from " + name + "? This cannot be undone.")) {
+      return;
+    }
+    api("/api/admin/testimonials/" + encodeURIComponent(id), { method: "DELETE" }).then(
+      function (result) {
+        if (!guard(result)) {
+          notice(result.data.error || "That testimonial could not be deleted.", "error");
+          return;
+        }
+        notice("Testimonial deleted.", "info");
+        loadTestimonials();
+        loadStats();
+      }
+    );
+  }
+
+  var TESTIMONIAL_LABELS = {
+    unconfirmed: "Unconfirmed",
+    pending: "Awaiting review",
+    published: "Published",
+    rejected: "Not published",
+  };
+
+  function renderTestimonials(payload) {
+    var wrap = $("testimonial-results");
+    wrap.textContent = "";
+
+    $("testimonial-count").textContent = payload.total
+      ? payload.total + (payload.total === 1 ? " testimonial" : " testimonials") + " found"
+      : "";
+
+    if (!payload.testimonials.length) {
+      var blank = el("div", "empty");
+      blank.append(
+        el("strong", null, "Nothing to review"),
+        el("p", null, "No testimonials match these filters.")
+      );
+      wrap.append(blank);
+      show($("testimonial-pager"), false);
+      return;
+    }
+
+    payload.testimonials.forEach(function (t) {
+      var card = el("div", "admin-idea");
+      card.append(el("h3", null, t.name));
+
+      var meta = el("div", "idea-meta flush");
+      meta.append(
+        statusTag(
+          t.status === "published" ? "approved" : t.status === "rejected" ? "rejected" : "pending",
+          TESTIMONIAL_LABELS[t.status] || t.status
+        ),
+        el("span", "idea-author", t.role || "—"),
+        el("span", null, t.organisation || "—"),
+        el("span", null, t.email || "no email (seeded)"),
+        el("span", null, formatDate(t.createdAt))
+      );
+      card.append(meta);
+
+      if (t.relationship) card.append(el("p", "body muted", t.relationship));
+
+      // Paragraphs are preserved, and each is set as text so a submitter's
+      // words can never become markup in the console either.
+      var bodyWrap = el("div", "body");
+      String(t.body)
+        .split(/\n{2,}/)
+        .forEach(function (para) {
+          if (para.trim()) bodyWrap.append(el("p", null, para.trim()));
+        });
+      card.append(bodyWrap);
+
+      var actions = el("div", "stack");
+
+      if (t.status === "unconfirmed") {
+        actions.append(
+          el("span", "hint", "Waiting on the author to confirm their email. Cannot be published yet.")
+        );
+      } else {
+        if (t.status !== "published") {
+          var publish = el("button", "button primary small", "Publish");
+          publish.type = "button";
+          publish.addEventListener("click", function () {
+            decideTestimonial(t.id, "published");
+          });
+          actions.append(publish);
+        }
+        if (t.status !== "rejected") {
+          var reject = el("button", "button quiet small", "Do not publish");
+          reject.type = "button";
+          reject.addEventListener("click", function () {
+            decideTestimonial(t.id, "rejected");
+          });
+          actions.append(reject);
+        }
+        if (t.status !== "pending") {
+          var reopen = el("button", "button quiet small", "Back to review");
+          reopen.type = "button";
+          reopen.addEventListener("click", function () {
+            decideTestimonial(t.id, "pending");
+          });
+          actions.append(reopen);
+        }
+      }
+
+      var del = el("button", "button quiet small", "Delete");
+      del.type = "button";
+      del.addEventListener("click", function () {
+        removeTestimonial(t.id, t.name);
+      });
+      actions.append(del);
+
+      card.append(actions);
+      wrap.append(card);
+    });
+
+    show($("testimonial-pager"), payload.hasMore || payload.page > 1);
+    $("testimonial-prev").disabled = payload.page <= 1;
+    $("testimonial-next").disabled = !payload.hasMore;
+  }
+
+  function loadTestimonials() {
+    var query = new URLSearchParams({
+      q: $("testimonial-search").value,
+      status: $("testimonial-status").value,
+      page: String(testimonialPage),
+    });
+    return api("/api/admin/testimonials?" + query).then(function (result) {
+      if (!guard(result)) return;
+      renderTestimonials(result.data);
+    });
+  }
+
+  /* Stages ---------------------------------------------------------------- */
+
+  // Labels and ordering come from lib/stages.js via the API, so adding a stage
+  // there needs no change here.
+  var stages = [];
+
+  function stageLabel(key) {
+    for (var i = 0; i < stages.length; i += 1) {
+      if (stages[i].key === key) return stages[i].label;
+    }
+    return key || "—";
+  }
+
+  function loadStages() {
+    return api("/api/stages")
+      .then(function (result) {
+        if (result.ok && result.data.stages) {
+          stages = result.data.stages;
+          var select = $("idea-stage");
+          stages.forEach(function (stage) {
+            var option = el("option", null, stage.label);
+            option.value = stage.key;
+            select.append(option);
+          });
+        }
+      })
+      .catch(function () {
+        /* Stage controls degrade to absent rather than breaking the console. */
+      });
+  }
+
+  function renderPipeline(byStage) {
+    var track = $("pipeline");
+    track.textContent = "";
+    if (!byStage || !byStage.length) return;
+
+    byStage.forEach(function (stage) {
+      var step = el("button", "pipeline-step");
+      step.type = "button";
+      step.setAttribute("data-stage", stage.key);
+      if (!stage.pipeline) step.setAttribute("data-off", "true");
+      if (stage.count > 0) step.setAttribute("data-filled", "true");
+      step.append(
+        el("strong", null, String(stage.count)),
+        el("span", null, stage.label)
+      );
+      step.title = "Show published ideas at: " + stage.label;
+      step.addEventListener("click", function () {
+        $("idea-status").value = "approved";
+        $("idea-stage").value = stage.key;
+        ideaPage = 1;
+        selectTab("ideas");
+        loadIdeas();
+      });
+      track.append(step);
+    });
+  }
+
   /* Stats ----------------------------------------------------------------- */
 
   function loadStats() {
@@ -133,11 +351,14 @@
       grid.textContent = "";
 
       // The accent stripe draws the eye to the queue that needs working.
+      var t = result.data.testimonials || {};
       [
-        ["Awaiting review", result.data.ideas.pending, "attention"],
+        ["Ideas awaiting review", result.data.ideas.pending, "attention"],
+        ["Testimonials awaiting review", t.pending || 0, "attention"],
         ["Published ideas", result.data.ideas.approved, "good"],
+        ["Published testimonials", t.published || 0, "good"],
         ["Active members", result.data.users.active, "good"],
-        ["Unconfirmed", result.data.users.pending, null],
+        ["Unconfirmed members", result.data.users.pending, null],
         ["Suspended", result.data.users.suspended, "warn"],
       ].forEach(function (row) {
         var card = el("div", "stat");
@@ -146,6 +367,8 @@
         card.append(el("strong", null, String(row[1])), el("span", null, row[0]));
         grid.append(card);
       });
+
+      renderPipeline(result.data.stages);
     });
   }
 
@@ -167,6 +390,26 @@
           ? "Marked as not published." + (result.data.notified ? " The author has been emailed." : "")
           : "Moved back to the review queue.",
         "success"
+      );
+      loadIdeas();
+      loadStats();
+    });
+  }
+
+  function moveStage(id, stage) {
+    return api("/api/admin/ideas/" + encodeURIComponent(id), {
+      method: "PATCH",
+      body: { stage: stage },
+    }).then(function (result) {
+      if (!guard(result)) {
+        notice(result.data.error || "That stage change did not save.", "error");
+        return;
+      }
+      notice(
+        result.data.stageMoved
+          ? "Moved to " + stageLabel(stage) + "."
+          : "Already at " + stageLabel(stage) + ".",
+        result.data.stageMoved ? "success" : "info"
       );
       loadIdeas();
       loadStats();
@@ -227,6 +470,27 @@
       card.append(meta);
       card.append(el("p", "body", idea.description));
 
+      var stageRow = el("div", "stage-control");
+      var stageId = "stage-" + idea.id;
+      var stageLab = el("label", null, "Stage");
+      stageLab.setAttribute("for", stageId);
+      var stageSelect = el("select");
+      stageSelect.id = stageId;
+      stages.forEach(function (stage) {
+        var option = el("option", null, stage.label);
+        option.value = stage.key;
+        if (stage.key === idea.stage) option.selected = true;
+        stageSelect.append(option);
+      });
+      stageSelect.addEventListener("change", function () {
+        moveStage(idea.id, stageSelect.value);
+      });
+      stageRow.append(stageLab, stageSelect);
+      if (idea.stageChangedAt) {
+        stageRow.append(el("span", "stage-moved", "moved " + formatDate(idea.stageChangedAt)));
+      }
+      if (stages.length) card.append(stageRow);
+
       var actions = el("div", "stack");
 
       if (idea.status !== "approved") {
@@ -276,6 +540,7 @@
     var query = new URLSearchParams({
       q: $("idea-search").value,
       status: $("idea-status").value,
+      stage: $("idea-stage").value,
       page: String(ideaPage),
     });
     return api("/api/admin/ideas?" + query).then(function (result) {
@@ -431,23 +696,47 @@
     };
   }
 
+  var TABS = ["ideas", "testimonials", "users"];
+
   function selectTab(which) {
-    var ideas = which === "ideas";
-    $("tab-ideas").setAttribute("aria-selected", String(ideas));
-    $("tab-users").setAttribute("aria-selected", String(!ideas));
-    show($("panel-ideas"), ideas);
-    show($("panel-users"), !ideas);
+    TABS.forEach(function (name) {
+      var active = name === which;
+      $("tab-" + name).setAttribute("aria-selected", String(active));
+      show($("panel-" + name), active);
+    });
     notice("");
-    if (ideas) loadIdeas();
+    if (which === "ideas") loadIdeas();
+    else if (which === "testimonials") loadTestimonials();
     else loadUsers();
   }
 
   function wireConsole() {
-    $("tab-ideas").addEventListener("click", function () {
-      selectTab("ideas");
+    TABS.forEach(function (name) {
+      $("tab-" + name).addEventListener("click", function () {
+        selectTab(name);
+      });
     });
-    $("tab-users").addEventListener("click", function () {
-      selectTab("users");
+
+    $("testimonial-search").addEventListener(
+      "input",
+      debounce(function () {
+        testimonialPage = 1;
+        loadTestimonials();
+      })
+    );
+    $("testimonial-status").addEventListener("change", function () {
+      testimonialPage = 1;
+      loadTestimonials();
+    });
+    $("testimonial-prev").addEventListener("click", function () {
+      if (testimonialPage > 1) {
+        testimonialPage -= 1;
+        loadTestimonials();
+      }
+    });
+    $("testimonial-next").addEventListener("click", function () {
+      testimonialPage += 1;
+      loadTestimonials();
     });
 
     $("idea-search").addEventListener(
@@ -457,9 +746,11 @@
         loadIdeas();
       })
     );
-    $("idea-status").addEventListener("change", function () {
-      ideaPage = 1;
-      loadIdeas();
+    ["idea-status", "idea-stage"].forEach(function (id) {
+      $(id).addEventListener("change", function () {
+        ideaPage = 1;
+        loadIdeas();
+      });
     });
     $("idea-prev").addEventListener("click", function () {
       if (ideaPage > 1) {
@@ -501,7 +792,9 @@
     show($("login-shell"), false);
     show($("console"), true);
     loadStats();
-    selectTab("ideas");
+    loadStages().then(function () {
+      selectTab("ideas");
+    });
   }
 
   // Ask the server whether the admin cookie is still good before showing

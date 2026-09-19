@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta
       name="description"
-      content="What people who have worked with Okayma.com say about the work. Full, attributed testimonials for Shreevaari Consulting Ltd."
+      content="What people who have worked with Okayma.com say about the work — and a place to add your own. Full, attributed testimonials for Shreevaari Consulting Ltd."
     >
     <title>Testimonials | Okayma.com</title>
     <link rel="canonical" href="https://okayma.com/testimonials">
@@ -28,6 +28,7 @@
     <link rel="preload" as="font" type="font/woff2" href="assets/fonts/fraunces-latin.woff2" crossorigin>
     <link rel="preload" as="font" type="font/woff2" href="assets/fonts/karla-latin.woff2" crossorigin>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="board.css">
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -55,50 +56,125 @@
         <p class="section-label">Backed By</p>
         <h1>What it is like on the other side of the work.</h1>
         <p>
-          Every testimonial here is named, dated, and reproduced in full. If you would like to
-          speak to any of these people directly rather than read what they wrote, ask and I will
-          make the introduction.
+          Every testimonial here is named and reproduced in full. If you have worked with me
+          and would write one, there is a form further down — it reaches me only after you
+          confirm your email address, and nothing appears here until I have read it.
         </p>
+
+        <div class="band-stats" aria-label="Testimonial summary">
+          <div class="band-stat">
+            <strong id="stat-testimonials" aria-live="polite">—</strong>
+            <span>Published</span>
+          </div>
+          <div class="band-stat">
+            <strong>Named</strong>
+            <span>No anonymous entries</span>
+          </div>
+          <div class="band-stat">
+            <strong>In full</strong>
+            <span>Never edited for length</span>
+          </div>
+        </div>
       </section>
 
-      <section class="section testimonial-list" aria-label="Testimonials">
-        <article class="testimonial reveal" id="saravanakumar-sakthivel">
-          <div class="testimonial-meta">
-            <p class="testimonial-name">Saravanakumar Sakthivel</p>
-            <p class="testimonial-role">Technical Director</p>
-            <p class="testimonial-org">SoftTeam Solutions Pvt. Ltd.</p>
-            <p class="testimonial-context">
-              Worked together on an e-commerce platform for small businesses during the pandemic,
-              with Sathiya as Solution Architect.
-            </p>
-            <p class="testimonial-date"><time datetime="2026-09-17">September 2026</time></p>
-          </div>
+      <p class="notice page-notice" id="confirm-notice" role="status" hidden></p>
 
-          <blockquote class="testimonial-body">
-            <p>
-              I have had the unique privilege of knowing Sathiya in two capacities &mdash; as my
-              junior at college, and as a trusted technology collaborator.
+      <section class="section testimonial-list" aria-labelledby="wall-title">
+        <h2 id="wall-title" class="sr-only">Published testimonials</h2>
+
+        <div id="wall-skeleton" class="skeleton" aria-hidden="true">
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line"></div>
+        </div>
+
+        <p class="sr-only" id="wall-status" role="status"></p>
+        <div class="empty" id="wall-state" hidden></div>
+        <div id="wall-list"></div>
+
+        <div class="pager" id="wall-pager" hidden>
+          <button class="button quiet small" type="button" id="wall-prev">← Newer</button>
+          <span class="result-count" id="wall-count"></span>
+          <button class="button quiet small" type="button" id="wall-next">Older →</button>
+        </div>
+      </section>
+
+      <!-- Submission --------------------------------------------------- -->
+      <section class="section testimonial-form-section" id="write" aria-labelledby="write-title">
+        <div class="testimonial-form-head">
+          <p class="section-label">Add Yours</p>
+          <h2 id="write-title">Write a testimonial.</h2>
+          <p>
+            If we have worked together — as a client, a colleague, a collaborator, or someone
+            who took an idea from the board and ran with it — I would be glad to hear it. Your
+            email address is used once, to confirm the testimonial is really from you, and is
+            never published or shared.
+          </p>
+        </div>
+
+        <div class="panel testimonial-form-panel">
+          <p class="notice" id="write-notice" role="alert" hidden></p>
+
+          <form id="write-form" novalidate>
+            <div class="field-row">
+              <div class="field">
+                <label for="t-name">Your full name</label>
+                <input id="t-name" name="name" type="text" autocomplete="name"
+                       maxlength="80" required>
+                <p class="field-error" id="err-t-name" role="alert"></p>
+              </div>
+              <div class="field">
+                <label for="t-email">Email address</label>
+                <input id="t-email" name="email" type="email" autocomplete="email"
+                       maxlength="254" required>
+                <p class="hint">Private. Used once to confirm, never published.</p>
+                <p class="field-error" id="err-t-email" role="alert"></p>
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="t-role">Your role or job title</label>
+                <input id="t-role" name="role" type="text" autocomplete="organization-title"
+                       maxlength="100" required>
+                <p class="field-error" id="err-t-role" role="alert"></p>
+              </div>
+              <div class="field">
+                <label for="t-organisation">Company or organisation</label>
+                <input id="t-organisation" name="organisation" type="text"
+                       autocomplete="organization" maxlength="120" required>
+                <p class="field-error" id="err-t-organisation" role="alert"></p>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="t-relationship">How do you know the work?</label>
+              <input id="t-relationship" name="relationship" type="text" maxlength="300" required>
+              <p class="hint">One line, shown beside your testimonial. For example: “Worked
+                together on a payments migration in 2024.”</p>
+              <p class="field-error" id="err-t-relationship" role="alert"></p>
+            </div>
+
+            <div class="field">
+              <label for="t-body">Your testimonial</label>
+              <textarea id="t-body" name="body" rows="9" maxlength="6000" required></textarea>
+              <p class="hint">
+                <span class="counter"><span id="t-words">0</span> words</span>
+                <span id="t-words-label">At least 30 words.</span>
+              </p>
+              <p class="field-error" id="err-t-body" role="alert"></p>
+            </div>
+
+            <p class="hint">
+              By submitting you agree that your name, role, organisation and words may be
+              published on this page. Ask at any time and it will be removed.
             </p>
-            <p>
-              During the height of the pandemic, we teamed up to build an e-commerce platform to
-              keep small businesses trading through an extremely difficult period. As Solution
-              Architect, Sathiya was the backbone of that initiative. He began with the real
-              business problem rather than the presenting symptoms, and turned it into a working
-              product that reached users quickly. He does not just build software; he designs
-              scalable, meaningful solutions to complex real-world problems. His technical
-              foresight and his ability to architect under pressure were decisive in getting the
-              platform live.
-            </p>
-            <p>
-              Above all his technical brilliance, what truly sets him apart is that he is an
-              outstanding human being. He brings empathy, integrity and deep dedication to
-              everything he touches. That is why I am glad to put my name behind Okayma.com. If
-              you have a business problem worth solving, or an idea that answers one, Sathiya is
-              the person I would take it to &mdash; he will meet it with calm, honest thinking,
-              and he will elevate both the technology and the people around it.
-            </p>
-          </blockquote>
-        </article>
+
+            <button class="button primary" type="submit" id="write-submit">
+              Send for confirmation
+            </button>
+          </form>
+        </div>
       </section>
 
       <section class="section testimonial-cta" aria-labelledby="testimonial-cta-title">
@@ -124,5 +200,6 @@
     </footer>
 
     <script src="site.js" defer></script>
+    <script src="testimonials.js" defer></script>
   </body>
 </html>

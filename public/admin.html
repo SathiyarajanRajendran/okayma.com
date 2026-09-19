@@ -58,9 +58,17 @@
 
         <div class="stat-grid" id="stats"></div>
 
+        <section class="pipeline" aria-labelledby="pipeline-title">
+          <h2 class="pipeline-title" id="pipeline-title">Idea pipeline</h2>
+          <p class="pipeline-hint">Published ideas only. Click a stage to filter the queue.</p>
+          <div class="pipeline-track" id="pipeline"></div>
+        </section>
+
         <div class="tabs" role="tablist" aria-label="Admin sections">
           <button class="tab" type="button" role="tab" id="tab-ideas"
                   aria-controls="panel-ideas" aria-selected="true">Ideas</button>
+          <button class="tab" type="button" role="tab" id="tab-testimonials"
+                  aria-controls="panel-testimonials" aria-selected="false">Testimonials</button>
           <button class="tab" type="button" role="tab" id="tab-users"
                   aria-controls="panel-users" aria-selected="false">Members</button>
         </div>
@@ -78,6 +86,10 @@
               <option value="approved">Published</option>
               <option value="rejected">Not published</option>
             </select>
+            <label class="sr-only" for="idea-stage">Filter by stage</label>
+            <select id="idea-stage">
+              <option value="">All stages</option>
+            </select>
           </div>
 
           <p class="result-count" id="idea-count" role="status"></p>
@@ -85,6 +97,30 @@
           <div class="pager" id="idea-pager" hidden>
             <button class="button quiet small" type="button" id="idea-prev">← Previous</button>
             <button class="button quiet small" type="button" id="idea-next">Next →</button>
+          </div>
+        </section>
+
+        <!-- Testimonial moderation -->
+        <section id="panel-testimonials" role="tabpanel" aria-labelledby="tab-testimonials" hidden>
+          <div class="toolbar">
+            <label class="sr-only" for="testimonial-search">Search testimonials</label>
+            <input id="testimonial-search" type="search"
+                   placeholder="Search by name, role, company, text or email…">
+            <label class="sr-only" for="testimonial-status">Filter by status</label>
+            <select id="testimonial-status">
+              <option value="pending">Awaiting review</option>
+              <option value="">Confirmed (all)</option>
+              <option value="published">Published</option>
+              <option value="rejected">Not published</option>
+              <option value="unconfirmed">Unconfirmed</option>
+            </select>
+          </div>
+
+          <p class="result-count" id="testimonial-count" role="status"></p>
+          <div id="testimonial-results"></div>
+          <div class="pager" id="testimonial-pager" hidden>
+            <button class="button quiet small" type="button" id="testimonial-prev">← Previous</button>
+            <button class="button quiet small" type="button" id="testimonial-next">Next →</button>
           </div>
         </section>
 

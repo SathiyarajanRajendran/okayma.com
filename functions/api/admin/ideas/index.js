@@ -1,5 +1,6 @@
 import { json } from "../../../../lib/http.js";
 import { cleanString } from "../../../../lib/validate.js";
+import { isStage } from "../../../../lib/stages.js";
 
 const PAGE_SIZE = 20;
 
@@ -30,6 +31,12 @@ export async function onRequestGet({ request, env }) {
     params.push(status);
   }
 
+  const stage = url.searchParams.get("stage") || "";
+  if (stage && isStage(stage)) {
+    where.push("i.stage = ?");
+    params.push(stage);
+  }
+
   const clause = where.length ? `WHERE ${where.join(" AND ")}` : "";
 
   const countRow = await env.DB.prepare(
@@ -39,7 +46,8 @@ export async function onRequestGet({ request, env }) {
     .first();
 
   const { results } = await env.DB.prepare(
-    `SELECT i.id, i.title, i.description, i.status, i.created_at, i.decided_at, i.admin_note,
+    `SELECT i.id, i.title, i.description, i.status, i.stage, i.stage_changed_at,
+            i.created_at, i.decided_at, i.admin_note,
             u.id AS user_id, u.first_name, u.last_name, u.email, u.title AS author_title,
             u.status AS user_status
        FROM ideas i
@@ -58,6 +66,8 @@ export async function onRequestGet({ request, env }) {
       title: row.title,
       description: row.description,
       status: row.status,
+      stage: row.stage,
+      stageChangedAt: row.stage_changed_at,
       createdAt: row.created_at,
       decidedAt: row.decided_at,
       adminNote: row.admin_note,

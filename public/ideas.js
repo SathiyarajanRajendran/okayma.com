@@ -10,6 +10,20 @@
   var WORD_TARGET = 75;
   var WORD_MAX = 100;
   var page = 1;
+  var stageLabels = {};
+
+  function loadStages() {
+    return api("/api/stages")
+      .then(function (result) {
+        if (!result.ok || !result.data.stages) return;
+        result.data.stages.forEach(function (stage) {
+          stageLabels[stage.key] = stage.label;
+        });
+      })
+      .catch(function () {
+        /* The badge is an enhancement; the board reads fine without it. */
+      });
+  }
 
   function $(id) {
     return document.getElementById(id);
@@ -141,6 +155,13 @@
       var item = el("li", "idea-card reveal");
 
       item.append(el("h3", null, idea.title), el("p", null, idea.description));
+
+      if (idea.stage && stageLabels[idea.stage]) {
+        var badge = el("span", "stage-badge", stageLabels[idea.stage]);
+        badge.setAttribute("data-stage", idea.stage);
+        badge.title = "Current stage";
+        item.append(badge);
+      }
 
       var meta = el("div", "idea-meta");
       meta.append(
@@ -438,5 +459,7 @@
   wireNav();
   handleAuthRedirect();
   refreshAccount();
-  loadBoard();
+  // Labels first, so the first paint already carries badges rather than
+  // popping them in a moment later.
+  loadStages().then(loadBoard);
 })();
