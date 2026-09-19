@@ -14,7 +14,7 @@ export async function onRequestGet({ request, env }) {
   const offset = (page - 1) * PAGE_SIZE;
 
   const { results } = await env.DB.prepare(
-    `SELECT i.id, i.title, i.description, i.created_at,
+    `SELECT i.id, i.title, i.description, i.created_at, i.stage, i.stage_changed_at,
             u.first_name, u.last_name, u.title AS author_title
        FROM ideas i
        JOIN users u ON u.id = i.user_id
@@ -31,6 +31,8 @@ export async function onRequestGet({ request, env }) {
     title: row.title,
     description: row.description,
     createdAt: row.created_at,
+    stage: row.stage,
+    stageChangedAt: row.stage_changed_at,
     author: `${row.first_name} ${row.last_name}`,
     authorTitle: row.author_title,
   }));
