@@ -47,7 +47,7 @@
       </a>
       <nav>
         <a href="#belief">Belief</a>
-        <a href="#founder">Founder</a>
+        <a href="#founder">Team</a>
         <a href="#method">Method</a>
         <a href="#engage">Engage</a>
         <a href="#ideas">Ventures</a>
@@ -173,8 +173,24 @@
         <!-- Rendered from /api/team by site.js. Hidden until it has content, so
              an empty roster or a failed fetch leaves no empty heading behind. -->
         <div class="team" id="team" hidden>
-          <p class="outcomes-label">Alongside</p>
-          <ul class="team-list" id="team-list"></ul>
+          <div class="team-head">
+            <p class="outcomes-label">The Team</p>
+            <div class="carousel-controls" id="team-controls" hidden>
+              <button class="carousel-button" type="button" id="team-prev"
+                      aria-label="Previous team member">&#8592;</button>
+              <button class="carousel-button" type="button" id="team-next"
+                      aria-label="Next team member">&#8594;</button>
+            </div>
+          </div>
+
+          <!-- A scroll-snap track rather than a transform: touch swipe, keyboard
+               and the scrollbar all work without being reimplemented, and the
+               arrows just drive scrollBy. -->
+          <ul class="team-list carousel-track" id="team-list"
+              tabindex="0" aria-label="Team members"></ul>
+
+          <div class="carousel-dots" id="team-dots" role="tablist"
+               aria-label="Choose a team member" hidden></div>
         </div>
       </section>
 

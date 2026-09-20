@@ -906,24 +906,122 @@ cite::before {
   border-top: 1px solid var(--line);
 }
 
+.team-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.team-head .outcomes-label {
+  margin: 0 !important;
+}
+
+/* Horizontal snap track. Native scrolling means touch swipe, the keyboard and
+   the scrollbar all work without being reimplemented; the arrows only call
+   scrollBy on top of it. */
 .team-list {
-  display: grid;
-  gap: 1px;
-  margin: 0;
-  padding: 0;
+  display: flex;
+  gap: 14px;
+  margin: 14px 0 0;
+  padding: 2px;
   list-style: none;
-  border: 1px solid var(--line);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.team-list::-webkit-scrollbar {
+  display: none;
+}
+
+.team-list:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 3px;
   border-radius: var(--radius);
-  overflow: hidden;
-  background: var(--line);
 }
 
 .team-card {
   display: grid;
   grid-template-columns: 96px minmax(0, 1fr);
   gap: clamp(16px, 2.4vw, 26px);
+  flex: 0 0 min(100%, 520px);
   padding: clamp(18px, 2.4vw, 26px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
   background: var(--paper-raised);
+  scroll-snap-align: start;
+}
+
+/* Controls ---------------------------------------------------------------- */
+
+.carousel-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.carousel-button {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  background: var(--paper-raised);
+  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 0.25s var(--ease), background-color 0.25s var(--ease),
+    transform 0.2s var(--ease);
+}
+
+.carousel-button:hover {
+  border-color: var(--ink);
+  transform: translateY(-1px);
+}
+
+.carousel-button:active {
+  transform: translateY(1px);
+}
+
+.carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.carousel-dot {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--line-strong);
+  cursor: pointer;
+  transition: background-color 0.25s var(--ease), transform 0.25s var(--ease);
+}
+
+.carousel-dot.is-active {
+  background: var(--teal);
+  transform: scale(1.35);
+}
+
+/* The dot itself is tiny; the hit area should not be. */
+.carousel-dot::before {
+  content: "";
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  transform: translate(-9px, -9px);
+}
+
+.carousel-dots {
+  position: relative;
 }
 
 .team-photo {
