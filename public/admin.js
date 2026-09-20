@@ -58,6 +58,16 @@
       : d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
   }
 
+  // Keeps the label in place and disables the control while a request is in
+  // flight, so a double click cannot submit the same form twice.
+  function busy(button, isBusy) {
+    if (!button) return;
+    button.disabled = isBusy;
+    button.classList.toggle("is-busy", isBusy);
+    if (isBusy) button.setAttribute("aria-busy", "true");
+    else button.removeAttribute("aria-busy");
+  }
+
   function statusTag(status, label) {
     var tag = el("span", "tag", label || status);
     tag.setAttribute("data-status", status);
@@ -122,6 +132,211 @@
       return false;
     }
     return result.ok;
+  }
+
+  /* Team ------------------------------------------------------------------ */
+
+  function resetTeamForm() {
+    var form = $("team-form");
+    form.reset();
+    $("team-id").value = "";
+    $("team-sort").value = "10";
+    $("team-form-title").textContent = "Add a team member";
+    $("team-submit").textContent = "Add member";
+    show($("team-cancel"), false);
+    show($("team-photo-current"), false);
+    clearTeamErrors();
+    notice("");
+  }
+
+  function clearTeamErrors() {
+    var form = $("team-form");
+    form.querySelectorAll(".field-error").forEach(function (p) {
+      p.textContent = "";
+    });
+    form.querySelectorAll("[aria-invalid]").forEach(function (input) {
+      input.removeAttribute("aria-invalid");
+    });
+    show($("team-notice"), false);
+  }
+
+  function editTeamMember(member) {
+    clearTeamErrors();
+    $("team-id").value = member.id;
+    $("team-name").value = member.name;
+    $("team-role").value = member.role || "";
+    $("team-bio").value = member.bio || "";
+    $("team-linkedin").value = member.linkedinUrl || "";
+    $("team-sort").value = String(member.sortOrder);
+    $("team-status").value = member.status;
+    $("team-photo").value = "";
+    $("team-form-title").textContent = "Edit " + member.name;
+    $("team-submit").textContent = "Save changes";
+    show($("team-cancel"), true);
+
+    var current = $("team-photo-current");
+    current.textContent = member.photoUrl
+      ? "A photo is already set. Choosing a file replaces it; leaving it empty keeps it."
+      : "No photo yet.";
+    show(current, true);
+
+    $("team-form").scrollIntoView({ behavior: "smooth", block: "start" });
+    $("team-name").focus();
+  }
+
+  function removeTeamMember(id, name) {
+    if (!window.confirm("Permanently delete " + name + " from the team? This cannot be undone.")) {
+      return;
+    }
+    api("/api/admin/team/" + encodeURIComponent(id), { method: "DELETE" }).then(function (result) {
+      if (!guard(result)) {
+        notice(result.data.error || "That team member could not be deleted.", "error");
+        return;
+      }
+      notice(name + " removed.", "info");
+      if ($("team-id").value === id) resetTeamForm();
+      loadTeam();
+    });
+  }
+
+  function renderTeam(payload) {
+    var wrap = $("team-results");
+    wrap.textContent = "";
+
+    $("team-count").textContent = payload.team.length
+      ? payload.team.length + (payload.team.length === 1 ? " member" : " members")
+      : "";
+
+    if (!payload.team.length) {
+      var blank = el("div", "empty");
+      blank.append(
+        el("strong", null, "No team members yet"),
+        el("p", null, "Add the first one with the form above.")
+      );
+      wrap.append(blank);
+      return;
+    }
+
+    payload.team.forEach(function (member) {
+      var card = el("div", "admin-idea team-row");
+
+      if (member.photoUrl) {
+        var img = document.createElement("img");
+        img.className = "team-row-photo";
+        img.src = member.photoUrl;
+        img.alt = "";
+        img.width = 64;
+        img.height = 64;
+        img.loading = "lazy";
+        card.append(img);
+      }
+
+      var main = el("div", "team-row-main");
+      main.append(el("h3", null, member.name));
+
+      var meta = el("div", "idea-meta flush");
+      meta.append(
+        statusTag(
+          member.status === "published" ? "approved" : "pending",
+          member.status === "published" ? "Published" : "Draft"
+        ),
+        el("span", "idea-author", member.role || "—"),
+        el("span", null, "order " + member.sortOrder),
+        el("span", null, member.photoUrl ? "photo set" : "no photo")
+      );
+      main.append(meta);
+      main.append(el("p", "body", member.bio));
+
+      var actions = el("div", "stack");
+      var edit = el("button", "button primary small", "Edit");
+      edit.type = "button";
+      edit.addEventListener("click", function () {
+        editTeamMember(member);
+      });
+      var del = el("button", "button quiet small", "Delete");
+      del.type = "button";
+      del.addEventListener("click", function () {
+        removeTeamMember(member.id, member.name);
+      });
+      actions.append(edit, del);
+      main.append(actions);
+
+      card.append(main);
+      wrap.append(card);
+    });
+  }
+
+  function loadTeam() {
+    return api("/api/admin/team").then(function (result) {
+      if (!guard(result)) return;
+      renderTeam(result.data);
+    });
+  }
+
+  // Multipart rather than JSON, so the portrait rides along with the fields in
+  // one request and there is no half-saved profile if the photo fails.
+  function submitTeam(event) {
+    event.preventDefault();
+    clearTeamErrors();
+
+    var form = $("team-form");
+    var id = $("team-id").value;
+    var button = $("team-submit");
+    var data = new FormData(form);
+    data.delete("id");
+
+    // An empty file input still serialises an entry; dropping it keeps the
+    // server's "no file means keep the current photo" rule intact.
+    var file = $("team-photo").files[0];
+    if (!file) data.delete("photo");
+
+    busy(button, true);
+    fetch(id ? "/api/admin/team/" + encodeURIComponent(id) : "/api/admin/team", {
+      method: "POST",
+      body: data,
+      credentials: "same-origin",
+    })
+      .then(function (response) {
+        return response
+          .json()
+          .catch(function () {
+            return {};
+          })
+          .then(function (payload) {
+            return { ok: response.ok, status: response.status, data: payload };
+          });
+      })
+      .then(function (result) {
+        if (!guard(result)) {
+          if (result.data.fields) {
+            Object.keys(result.data.fields).forEach(function (name) {
+              var target = $("err-team-" + name);
+              if (target) target.textContent = result.data.fields[name];
+              var input = form.querySelector('[name="' + name + '"]');
+              if (input) input.setAttribute("aria-invalid", "true");
+            });
+          }
+          var el_ = $("team-notice");
+          el_.textContent = result.data.error || "That did not save.";
+          el_.setAttribute("data-tone", "error");
+          show(el_, true);
+          return;
+        }
+        // Reset first: it clears the notice bar, so setting the message
+        // afterwards is what makes the confirmation actually survive.
+        resetTeamForm();
+        notice(
+          id ? result.data.name + " updated." : result.data.name + " added to the team.",
+          "success"
+        );
+        loadTeam();
+      })
+      .catch(function () {
+        notice("Network error. Please try again.", "error");
+      })
+      .finally(function () {
+        busy(button, false);
+      });
   }
 
   /* Testimonials ---------------------------------------------------------- */
@@ -696,7 +911,7 @@
     };
   }
 
-  var TABS = ["ideas", "testimonials", "users"];
+  var TABS = ["ideas", "testimonials", "team", "users"];
 
   function selectTab(which) {
     TABS.forEach(function (name) {
@@ -707,6 +922,7 @@
     notice("");
     if (which === "ideas") loadIdeas();
     else if (which === "testimonials") loadTestimonials();
+    else if (which === "team") loadTeam();
     else loadUsers();
   }
 
@@ -716,6 +932,9 @@
         selectTab(name);
       });
     });
+
+    $("team-form").addEventListener("submit", submitTeam);
+    $("team-cancel").addEventListener("click", resetTeamForm);
 
     $("testimonial-search").addEventListener(
       "input",
