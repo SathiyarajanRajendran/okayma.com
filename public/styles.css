@@ -898,6 +898,86 @@ cite::before {
   line-height: 1.55;
 }
 
+/* Team (public, under the founder) ----------------------------------------- */
+
+.team {
+  margin-top: clamp(34px, 5vw, 56px);
+  padding-top: clamp(26px, 3.4vw, 38px);
+  border-top: 1px solid var(--line);
+}
+
+.team-list {
+  display: grid;
+  gap: 1px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--line);
+}
+
+.team-card {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: clamp(16px, 2.4vw, 26px);
+  padding: clamp(18px, 2.4vw, 26px);
+  background: var(--paper-raised);
+}
+
+.team-photo {
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--paper-sunk);
+}
+
+/* Initials stand in until a portrait is uploaded, so the row keeps its shape. */
+.team-initials {
+  display: grid;
+  place-items: center;
+  color: var(--ink-mute);
+  font-family: var(--display);
+  font-size: 1.9rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.team-body {
+  min-width: 0;
+}
+
+.team-name {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.team-role {
+  margin: 3px 0 0;
+  color: var(--teal-deep);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.team-bio {
+  margin: 12px 0 0;
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.team-body .contact-link {
+  margin-top: 12px;
+  font-size: 0.86rem;
+}
+
 /* Attributed pull quote --------------------------------------------------- */
 
 /* A named quote runs longer than the one-line founder statement it replaced,
@@ -1428,6 +1508,15 @@ footer a:hover {
 
   .founder-card figcaption {
     margin-top: 0;
+  }
+
+  .team-card {
+    grid-template-columns: 1fr;
+  }
+
+  .team-photo {
+    width: 84px;
+    height: 84px;
   }
 
   .pull-quote p {

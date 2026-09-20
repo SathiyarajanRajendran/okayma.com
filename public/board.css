@@ -1077,3 +1077,49 @@ td .stack {
   margin: 0 var(--gutter);
   transform: translateY(-50%);
 }
+
+/* Team (admin console) ------------------------------------------------------ */
+
+.team-form-panel {
+  max-width: 900px;
+  margin-bottom: 26px;
+}
+
+.team-form-panel h3 {
+  margin-bottom: 4px;
+  font-family: var(--display);
+  font-size: 1.5rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.team-row {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.team-row-photo {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--paper-sunk);
+}
+
+.team-row-main {
+  min-width: 0;
+}
+
+@media (max-width: 560px) {
+  .team-row {
+    grid-template-columns: 1fr;
+  }
+
+  .team-row-photo {
+    width: 84px;
+    height: 84px;
+  }
+}

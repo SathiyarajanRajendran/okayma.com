@@ -69,6 +69,8 @@
                   aria-controls="panel-ideas" aria-selected="true">Ideas</button>
           <button class="tab" type="button" role="tab" id="tab-testimonials"
                   aria-controls="panel-testimonials" aria-selected="false">Testimonials</button>
+          <button class="tab" type="button" role="tab" id="tab-team"
+                  aria-controls="panel-team" aria-selected="false">Team</button>
           <button class="tab" type="button" role="tab" id="tab-users"
                   aria-controls="panel-users" aria-selected="false">Members</button>
         </div>
@@ -122,6 +124,82 @@
             <button class="button quiet small" type="button" id="testimonial-prev">← Previous</button>
             <button class="button quiet small" type="button" id="testimonial-next">Next →</button>
           </div>
+        </section>
+
+        <!-- Team -->
+        <section id="panel-team" role="tabpanel" aria-labelledby="tab-team" hidden>
+          <div class="panel team-form-panel">
+            <h3 id="team-form-title">Add a team member</h3>
+            <p class="hint">
+              Appears under “Who you are working with” on the homepage, below the founder.
+            </p>
+
+            <p class="notice" id="team-notice" role="alert" hidden></p>
+
+            <form id="team-form" novalidate>
+              <input type="hidden" name="id" id="team-id" value="">
+
+              <div class="field-row">
+                <div class="field">
+                  <label for="team-name">Full name</label>
+                  <input id="team-name" name="name" type="text" maxlength="80" required>
+                  <p class="field-error" id="err-team-name" role="alert"></p>
+                </div>
+                <div class="field">
+                  <label for="team-role">Role or title</label>
+                  <input id="team-role" name="role" type="text" maxlength="120" required>
+                  <p class="field-error" id="err-team-role" role="alert"></p>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="team-bio">Biography</label>
+                <textarea id="team-bio" name="bio" rows="5" maxlength="1200" required></textarea>
+                <p class="hint">At least 10 words. Shown in full on the homepage.</p>
+                <p class="field-error" id="err-team-bio" role="alert"></p>
+              </div>
+
+              <div class="field-row">
+                <div class="field">
+                  <label for="team-linkedin">LinkedIn URL <span class="muted">(optional)</span></label>
+                  <input id="team-linkedin" name="linkedinUrl" type="url" maxlength="300"
+                         placeholder="https://www.linkedin.com/in/…">
+                  <p class="field-error" id="err-team-linkedinUrl" role="alert"></p>
+                </div>
+                <div class="field">
+                  <label for="team-sort">Order</label>
+                  <input id="team-sort" name="sortOrder" type="number" value="10" step="10">
+                  <p class="hint">Lower numbers appear first.</p>
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field">
+                  <label for="team-photo">Photo</label>
+                  <input id="team-photo" name="photo" type="file"
+                         accept="image/jpeg,image/png,image/webp">
+                  <p class="hint">JPEG, PNG or WebP, under 2MB. Square portraits look best.</p>
+                  <p class="field-error" id="err-team-photo" role="alert"></p>
+                </div>
+                <div class="field">
+                  <label for="team-status">Visibility</label>
+                  <select id="team-status" name="status">
+                    <option value="published">Published</option>
+                    <option value="draft">Draft (hidden)</option>
+                  </select>
+                  <p class="hint" id="team-photo-current" hidden></p>
+                </div>
+              </div>
+
+              <div class="stack">
+                <button class="button primary small" type="submit" id="team-submit">Add member</button>
+                <button class="button quiet small" type="button" id="team-cancel" hidden>Cancel</button>
+              </div>
+            </form>
+          </div>
+
+          <p class="result-count" id="team-count" role="status"></p>
+          <div id="team-results"></div>
         </section>
 
         <!-- Member management -->
