@@ -113,8 +113,150 @@
 
       wrap.hidden = false;
       if (typeof window.okaymaReveal === "function") window.okaymaReveal(wrap);
+      startCarousel(data.team.length);
     })
     .catch(function () {
       /* The founder section stands on its own; a failed roster shows nothing. */
     });
+
+  /* Carousel ------------------------------------------------------------- */
+
+  function startCarousel(count) {
+    var controls = document.getElementById("team-controls");
+    var dotsWrap = document.getElementById("team-dots");
+    var prev = document.getElementById("team-prev");
+    var next = document.getElementById("team-next");
+
+    // One card cannot slide, so the controls would be decoration that lies
+    // about there being more to see.
+    if (count < 2) return;
+
+    controls.hidden = false;
+    dotsWrap.hidden = false;
+
+    var reduced =
+      window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var behavior = reduced ? "auto" : "smooth";
+
+    function step() {
+      var card = list.querySelector(".team-card");
+      if (!card) return 0;
+      var styles = window.getComputedStyle(list);
+      var gap = parseFloat(styles.columnGap || styles.gap || "0") || 0;
+      return card.getBoundingClientRect().width + gap;
+    }
+
+    // How far the track can scroll; used to decide when to wrap around.
+    function maxScroll() {
+      return list.scrollWidth - list.clientWidth;
+    }
+
+    function go(direction) {
+      var amount = step();
+      if (!amount) return;
+      var atEnd = list.scrollLeft >= maxScroll() - 2;
+      var atStart = list.scrollLeft <= 2;
+
+      if (direction > 0 && atEnd) list.scrollTo({ left: 0, behavior: behavior });
+      else if (direction < 0 && atStart) {
+        list.scrollTo({ left: maxScroll(), behavior: behavior });
+      } else {
+        list.scrollBy({ left: amount * direction, behavior: behavior });
+      }
+    }
+
+    next.addEventListener("click", function () {
+      go(1);
+      restart();
+    });
+    prev.addEventListener("click", function () {
+      go(-1);
+      restart();
+    });
+
+    // Dots ----------------------------------------------------------------
+    var dots = [];
+    var cards = list.querySelectorAll(".team-card");
+    cards.forEach(function (card, index) {
+      var dot = document.createElement("button");
+      dot.type = "button";
+      dot.className = "carousel-dot";
+      dot.setAttribute("role", "tab");
+      dot.setAttribute("aria-label", "Show team member " + (index + 1));
+      dot.addEventListener("click", function () {
+        list.scrollTo({ left: step() * index, behavior: behavior });
+        restart();
+      });
+      dotsWrap.append(dot);
+      dots.push(dot);
+    });
+
+    function syncDots() {
+      var amount = step();
+      if (!amount) return;
+      var active = Math.round(list.scrollLeft / amount);
+      dots.forEach(function (dot, index) {
+        var on = index === active;
+        dot.setAttribute("aria-selected", String(on));
+        dot.classList.toggle("is-active", on);
+      });
+    }
+
+    var ticking = false;
+    list.addEventListener("scroll", function () {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(function () {
+        syncDots();
+        ticking = false;
+      });
+    });
+    syncDots();
+
+    // Autoplay ------------------------------------------------------------
+    //
+    // Under reduced motion nothing below starts anything: play() returns
+    // immediately. The arrows, dots, swipe and keyboard all still work, so
+    // nothing is lost but the movement.
+    var timer = null;
+
+    function play() {
+      // Guarded here rather than only at the call below: the arrow and dot
+      // handlers call restart(), which would otherwise start autoplay for
+      // someone who has asked for reduced motion.
+      if (reduced) return;
+      stop();
+      timer = window.setInterval(function () {
+        // Pointless work while the tab is in the background, and it would
+        // otherwise queue up jumps that all land at once on return.
+        if (document.hidden) return;
+        go(1);
+      }, 5000);
+    }
+
+    function stop() {
+      if (timer) window.clearInterval(timer);
+      timer = null;
+    }
+
+    function restart() {
+      stop();
+      play();
+    }
+
+    // Stop while someone is reading or interacting, by any means of getting
+    // there: mouse, keyboard, or touch.
+    ["pointerenter", "focusin", "touchstart"].forEach(function (event) {
+      wrap.addEventListener(event, stop, { passive: true });
+    });
+    ["pointerleave", "focusout"].forEach(function (event) {
+      wrap.addEventListener(event, play);
+    });
+    document.addEventListener("visibilitychange", function () {
+      if (document.hidden) stop();
+      else play();
+    });
+
+    play();
+  }
 })();
