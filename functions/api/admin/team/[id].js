@@ -1,7 +1,7 @@
 import { fail, json, sameOrigin, nowIso } from "../../../../lib/http.js";
 import { validateTeamMember } from "../../../../lib/validate.js";
 import { validatePhoto } from "../../../../lib/images.js";
-import { readTeamForm } from "./index.js";
+import { readTeamForm } from "../../../../lib/teamform.js";
 
 // Update a team member. Sent as multipart so the same form can carry a
 // replacement portrait; a submission with no file leaves the existing one in

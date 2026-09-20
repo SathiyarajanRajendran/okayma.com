@@ -15,17 +15,26 @@
 # CSS and JS revalidate on every request (cheap 304s). These filenames are not
 # content-hashed, so a long max-age could leave a visitor running yesterday's
 # script against today's markup after a deploy.
+#
+# `no-cache` rather than `max-age=0`: Cloudflare's zone-level Browser Cache TTL
+# overrides an origin max-age, and was rewriting these to 14400 in production —
+# four hours during which a returning visitor kept the previous deploy's script.
+# no-cache is not rewritten, and means the same thing here: store it, but check
+# with the origin before using it.
 /styles.css
-  Cache-Control: public, max-age=0, must-revalidate
+  Cache-Control: no-cache
 
 /board.css
-  Cache-Control: public, max-age=0, must-revalidate
+  Cache-Control: no-cache
 
 /ideas.js
-  Cache-Control: public, max-age=0, must-revalidate
+  Cache-Control: no-cache
 
 /site.js
-  Cache-Control: public, max-age=0, must-revalidate
+  Cache-Control: no-cache
+
+/testimonials.js
+  Cache-Control: no-cache
 
 /admin.js
   Cache-Control: no-store
@@ -42,4 +51,4 @@
   Cache-Control: no-store
 
 /*.html
-  Cache-Control: public, max-age=0, must-revalidate
+  Cache-Control: no-cache
