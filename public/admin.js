@@ -273,6 +273,98 @@
     });
   }
 
+  var PHOTO_SIZE = 512;
+
+  // Redraws the chosen photo as a square PHOTO_SIZE image before it is sent.
+  //
+  // A phone camera portrait is several megabytes and thousands of pixels wide,
+  // for a card that renders at 96px. Doing this in the browser costs nothing,
+  // keeps the row small, and means the 2MB server limit is almost impossible
+  // to hit by accident. Workers cannot decode images, so the alternative would
+  // have been a paid image service.
+  //
+  // Resolves null when the file cannot be handled, in which case the original
+  // is sent and the server's own validation decides.
+
+  // Decodes the file without ever creating a blob: URL. The site's CSP is
+  // `img-src 'self' data:`, so an <img src="blob:..."> is refused and the
+  // resize would silently do nothing. createImageBitmap takes the Blob
+  // directly; the data: URL path is the fallback for browsers without it, and
+  // data: is already permitted.
+  function decodeImage(file) {
+    if (typeof window.createImageBitmap === "function") {
+      return window.createImageBitmap(file).catch(function () {
+        return decodeViaDataUrl(file);
+      });
+    }
+    return decodeViaDataUrl(file);
+  }
+
+  function decodeViaDataUrl(file) {
+    return new Promise(function (resolve, reject) {
+      var reader = new FileReader();
+      reader.onload = function () {
+        var img = new Image();
+        img.onload = function () {
+          resolve(img);
+        };
+        img.onerror = reject;
+        img.src = reader.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function resizePhoto(file) {
+    if (!file || !/^image\/(jpeg|png|webp)$/.test(file.type)) return Promise.resolve(null);
+    if (!window.HTMLCanvasElement) return Promise.resolve(null);
+
+    return decodeImage(file)
+      .then(function (source) {
+        var w = source.width || source.naturalWidth;
+        var h = source.height || source.naturalHeight;
+        if (!w || !h) return null;
+
+        var side = Math.min(w, h);
+        var sx = (w - side) / 2;
+        // Faces sit above the middle of a portrait, so a true centre crop
+        // tends to take the chin and leave out the top of the head.
+        var sy = h > w ? (h - side) * 0.3 : (h - side) / 2;
+
+        var canvas = document.createElement("canvas");
+        canvas.width = PHOTO_SIZE;
+        canvas.height = PHOTO_SIZE;
+        var ctx = canvas.getContext("2d");
+        if (!ctx) return null;
+        ctx.drawImage(source, sx, sy, side, side, 0, 0, PHOTO_SIZE, PHOTO_SIZE);
+        if (source.close) source.close();
+
+        return new Promise(function (resolve) {
+          canvas.toBlob(
+            function (webp) {
+              // Browsers that cannot encode WebP silently hand back a PNG,
+              // which for a photograph is larger than the original. Asking
+              // for JPEG explicitly is the fallback.
+              if (webp && webp.type === "image/webp") return resolve(webp);
+              canvas.toBlob(
+                function (jpeg) {
+                  resolve(jpeg && jpeg.type === "image/jpeg" ? jpeg : null);
+                },
+                "image/jpeg",
+                0.85
+              );
+            },
+            "image/webp",
+            0.85
+          );
+        });
+      })
+      .catch(function () {
+        return null;
+      });
+  }
+
   // Multipart rather than JSON, so the portrait rides along with the fields in
   // one request and there is no half-saved profile if the photo fails.
   function submitTeam(event) {
@@ -291,11 +383,18 @@
     if (!file) data.delete("photo");
 
     busy(button, true);
-    fetch(id ? "/api/admin/team/" + encodeURIComponent(id) : "/api/admin/team", {
-      method: "POST",
-      body: data,
-      credentials: "same-origin",
-    })
+    resizePhoto(file)
+      .then(function (resized) {
+        if (resized) {
+          var ext = resized.type === "image/webp" ? ".webp" : ".jpg";
+          data.set("photo", resized, "portrait" + ext);
+        }
+        return fetch(id ? "/api/admin/team/" + encodeURIComponent(id) : "/api/admin/team", {
+          method: "POST",
+          body: data,
+          credentials: "same-origin",
+        });
+      })
       .then(function (response) {
         return response
           .json()
